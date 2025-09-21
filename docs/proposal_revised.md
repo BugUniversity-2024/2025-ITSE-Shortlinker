@@ -98,48 +98,46 @@ Through the benefits, the shortlinkers gives a more convenient and cheap platfor
 
 ### Timeline
 
-*Note: Specific dates will be updated based on actual project progress and course requirements*
-
-| Phase | Description | End Date |
-| --- | --- | --- |
-| Phase1 | Website architecture completed and project initialization | TBD |
-| Phase2 | Research on shortening and redirection algorithms | TBD |
-| Phase3 | Front and backend separate development | TBD |
-| Phase4 | Front and backend separate testing | TBD |
-| Phase5 | Front and backend interconnection and software testing | TBD |
-| Phase6 | Software deployment and launch | TBD |
+| Phase  | Description                                               | End Date              |
+| ------ | --------------------------------------------------------- | --------------------- |
+| Phase1 | Website architecture completed and project initialization | 16th, September, 2025 |
+| Phase2 | Research on shortening and redirection algorithms         | 26th, September, 2025 |
+| Phase3 | Front and backend separate development                    | 20th, October, 2025   |
+| Phase4 | Front and backend separate testing                        | 10th, November, 2025  |
+| Phase5 | Front and backend interconnection and software testing    | 20th, November, 2025  |
+| Phase6 | Software deployment and launch                            | 24th, November, 2025  |
 
 ### Action plan
 
 Objectives 1: Implement URL shortening and redirection functionality, build a basic web interface, and user login system.
 
-| Action | Assigned to | Deadline | Progress |
-| --- | --- | --- | --- |
-| Requirement analysis and requirement documentation | | TBD | Completed |  
-| Research on 8-character random string generation algorithms | | TBD | In-progress |
-| Design of data model and database table structure | | TBD | In-progress |
-| API interface design and documentation | | TBD | In-progress |
-| Website architecture design complete | | TBD | In-progress |
+| Action                                                      | Assigned to | Deadline | Progress    |
+| ----------------------------------------------------------- | ----------- | -------- | ----------- |
+| Requirement analysis and requirement documentation          |             | TBD      | Completed   |
+| Research on 8-character random string generation algorithms |             | TBD      | In-progress |
+| Design of data model and database table structure           |             | TBD      | In-progress |
+| API interface design and documentation                      |             | TBD      | In-progress |
+| Website architecture design complete                        |             | TBD      | In-progress |
 
 Objectives 2: Develop a user-friendly web interface for URL shortening and redirection, and implement basic analytics features.
 
-| Action | Assigned to | Deadline | Progress |
-| --- | --- | --- | --- |
-| Frontend UI/UX design and prototype development | | TBD | In-progress |
-| Multi-database support implementation research | | TBD | In-progress |
-| Caching mechanism and Bloom filter design | | TBD | In-progress |
-| Basic analytics data collection implementation | | TBD | In-progress |
-| Performance optimization and testing | | TBD | In-progress |
+| Action                                          | Assigned to | Deadline | Progress    |
+| ----------------------------------------------- | ----------- | -------- | ----------- |
+| Frontend UI/UX design and prototype development |             | TBD      | In-progress |
+| Multi-database support implementation research  |             | TBD      | In-progress |
+| Caching mechanism and Bloom filter design       |             | TBD      | In-progress |
+| Basic analytics data collection implementation  |             | TBD      | In-progress |
+| Performance optimization and testing            |             | TBD      | In-progress |
 
 Objectives 3: Enhance the web interface with advanced features, including user account management, and detailed analytics.
 
-| Action | Assigned to | Deadline | Progress |
-| --- | --- | --- | --- |
-| Project Proposal writing | | TBD | Completed |
-| White paper writing | | TBD | In-progress |
-| Team collaboration features backend development | | TBD | In-progress |
-| Advanced analytics and visualization frontend development | | TBD | In-progress |
-| Front and backend interconnection and software testing | | TBD | In-progress |
-| Technical document writing | | TBD | In-progress |
-| Proof-of-concept software report writing | | TBD | In-progress |
-| Software deployment and final presentation | | TBD | In-progress |
+| Action                                                    | Assigned to | Deadline | Progress    |
+| --------------------------------------------------------- | ----------- | -------- | ----------- |
+| Project Proposal writing                                  |             | TBD      | Completed   |
+| White paper writing                                       |             | TBD      | In-progress |
+| Team collaboration features backend development           |             | TBD      | In-progress |
+| Advanced analytics and visualization frontend development |             | TBD      | In-progress |
+| Front and backend interconnection and software testing    |             | TBD      | In-progress |
+| Technical document writing                                |             | TBD      | In-progress |
+| Proof-of-concept software report writing                  |             | TBD      | In-progress |
+| Software deployment and final presentation                |             | TBD      | In-progress |

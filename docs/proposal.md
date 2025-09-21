@@ -105,46 +105,46 @@ Through the benefits, the shortlinkers gives a more convenient and cheap platfor
 
 ### Timeline
 
-| Phase | Description | End Date |
-| --- | --- | --- |
+| Phase  | Description                                               | End Date              |
+| ------ | --------------------------------------------------------- | --------------------- |
 | Phase1 | Website architecture completed and project initialization | 16th, September, 2025 |
-| Phase2 | Research on shortening and redirection algorithms | 26th, September, 2025 |
-| Phase3 | Front and backend separate development | 20th, October, 2025 |
-| Phase4 | Front and backend separate testing | 10th, November, 2025 |
-| Phase5 | Front and backend interconnection and software testing | 20th, November, 2025 |
-| Phase6 | Software deployment and launch | 26th, November, 2025 |
+| Phase2 | Research on shortening and redirection algorithms         | 26th, September, 2025 |
+| Phase3 | Front and backend separate development                    | 20th, October, 2025   |
+| Phase4 | Front and backend separate testing                        | 10th, November, 2025  |
+| Phase5 | Front and backend interconnection and software testing    | 20th, November, 2025  |
+| Phase6 | Software deployment and launch                            | 26th, November, 2025  |
 
 ### Action plan
 
 Objectives 1: Implement URL shortening and redirection functionality, build a basic web interface, and user login system.
 
-| Action | Assigned to | Deadline | Progress |
-| --- | --- | --- | --- |
-| Requirement analysis and requirement documentation | | 16th, September, 2025 | Completed |  
-| Research on shortening and redirection algorithms | | 26th, September, 2025 | In-progress |
-| Design of data model and database table structure | | | In-progress |
-| API interface design | | | In-progress |
-| Website architecture design complete | | | In-progress |
+| Action                                             | Assigned to | Deadline              | Progress    |
+| -------------------------------------------------- | ----------- | --------------------- | ----------- |
+| Requirement analysis and requirement documentation |             | 16th, September, 2025 | Completed   |
+| Research on shortening and redirection algorithms  |             | 26th, September, 2025 | In-progress |
+| Design of data model and database table structure  |             |                       | In-progress |
+| API interface design                               |             |                       | In-progress |
+| Website architecture design complete               |             |                       | In-progress |
 
 Objectives 2: Develop a user-friendly web interface for URL shortening and redirection, and implement basic analytics features.
 
-| Action | Assigned to | Deadline | Progress |
-| --- | --- | --- | --- |
-| Search for relevant data and literature | | | In-progress |
-| Trade-offs between different options | | | In-progress |
-| Determine the final scheme and design the algorithm | | | In-progress |
-| The preliminary implementation of the algorithm | | | In-progress |
-| Embedding algorithms into the back end of the application | | | In-progress |
+| Action                                                    | Assigned to | Deadline | Progress    |
+| --------------------------------------------------------- | ----------- | -------- | ----------- |
+| Search for relevant data and literature                   |             |          | In-progress |
+| Trade-offs between different options                      |             |          | In-progress |
+| Determine the final scheme and design the algorithm       |             |          | In-progress |
+| The preliminary implementation of the algorithm           |             |          | In-progress |
+| Embedding algorithms into the back end of the application |             |          | In-progress |
 
 Objectives 3: Enhance the web interface with advanced features, including user account management, and detailed analytics.
 
-| Action | Assigned to | Deadline | Progress |
-| --- | --- | --- | --- |
-| Project Proposal writing | | 20th, September, 2025 | Completed |
-| White paper writing | | 13th, October, 2025 | In-progress |
-| The backend development task complete | | | In-progress |
-| The frontend development task complete | | | In-progress |
-| Front and backend interconnection and software testing | | | In-progress |
-| Technical document writing | | | In-progress |
-| Proof-of-concept software report writing | | | In-progress |
-| Software deployment and final presentation | | | In-progress |
+| Action                                                 | Assigned to | Deadline              | Progress    |
+| ------------------------------------------------------ | ----------- | --------------------- | ----------- |
+| Project Proposal writing                               |             | 20th, September, 2025 | Completed   |
+| White paper writing                                    |             | 13th, October, 2025   | In-progress |
+| The backend development task complete                  |             |                       | In-progress |
+| The frontend development task complete                 |             |                       | In-progress |
+| Front and backend interconnection and software testing |             |                       | In-progress |
+| Technical document writing                             |             |                       | In-progress |
+| Proof-of-concept software report writing               |             |                       | In-progress |
+| Software deployment and final presentation             |             |                       | In-progress |
