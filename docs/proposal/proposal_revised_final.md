@@ -111,48 +111,33 @@ Through the benefits, the shortlinkers gives a more convenient and cheap platfor
 
 Objectives 1: Implement URL shortening and redirection functionality, build a basic web interface, and user login system.
 
-| Action                                                      | Assigned to | Deadline | Progress    |
-| ----------------------------------------------------------- | ----------- | -------- | ----------- |
-| Requirement analysis and requirement documentation          | Heng Liu    | 22th, September, 2025  | Completed   |
-| Research on 8-character random string generation algorithms | Yichen Li   | 23th, September, 2025  | In-progress |
-|                                                             | Luyao Huang |                     |  |
-| Design of data model and database table structure           | Jialu Shen  | 24th, September, 2025  | In-progress |
-| API interface design and documentation                      | Yiman Li    | 24th, September, 2025  | In-progress |
-| Website architecture design complete                        | Heng Liu    | 25th, September, 2025  | In-progress |
+| Action                                                      | Assigned to                | Deadline              | Progress    |
+| ----------------------------------------------------------- | -------------------------- | --------------------- | ----------- |
+| Requirement analysis and requirement documentation          | Heng Liu                   | 22th, September, 2025 | Completed   |
+| Research on 8-character random string generation algorithms | Yichen Li<br />Luyao Huang | 23th, September, 2025 | In-progress |
+| Design of data model and database table structure           | Jialu Shen                 | 24th, September, 2025 | In-progress |
+| API interface design and documentation                      | Yiman Li                   | 24th, September, 2025 | In-progress |
+| Website architecture design complete                        | Heng Liu                   | 25th, September, 2025 | In-progress |
 
 Objectives 2: Develop a user-friendly web interface for URL shortening and redirection, and implement basic analytics features.
 
-| Action                                          |  Assigned to  |        Deadline      | Progress    |
-| ----------------------------------------------- | ------------- | -------------------- | ----------- |
-| Frontend UI/UX design and prototype development | Yichen Li     | 10th, October, 2025  | In-progress |
-| Multi-database support implementation research  | Jialu Shen    | 13th, October, 2025  | In-progress |
-| Caching mechanism and Bloom filter design       | Heng Liu      | 15th, October, 2025  | In-progress |
-| Basic analytics data collection implementation  | Yuchen Huang  | 20th, October, 2025  | In-progress |
-| Performance optimization and testing            | Yuchen Huang  | 10th, November, 2025 | In-progress |
+| Action                                          | Assigned to  | Deadline             | Progress    |
+| ----------------------------------------------- | ------------ | -------------------- | ----------- |
+| Frontend UI/UX design and prototype development | Yichen Li    | 10th, October, 2025  | In-progress |
+| Multi-database support implementation research  | Jialu Shen   | 13th, October, 2025  | In-progress |
+| Caching mechanism and Bloom filter design       | Heng Liu     | 15th, October, 2025  | In-progress |
+| Basic analytics data collection implementation  | Yuchen Huang | 20th, October, 2025  | In-progress |
+| Performance optimization and testing            | Yuchen Huang | 10th, November, 2025 | In-progress |
 
 Objectives 3: Enhance the web interface with advanced features, including user account management, and detailed analytics.
 
-| Action                                                    | Assigned to | Deadline | Progress    |
-| --------------------------------------------------------- | ----------- | -------- | ----------- |
-| Project Proposal writing                                  | Heng Liu      | 22th, September, 2025  | Completed   |
-|                                                           | Yuchen Huang  |                     |  |
-|                                                           | Yulin Qiu     |                     |  |
-|                                                           | Yiman Li      |                     |  |
-|                                                           | Jialu Shen    |                     |  |
-| White paper writing                                       | Yulin Qiu     | 13th, October, 2025    | In-progress |
-|                                                           | Zuxin Wu      |                     |  |
-|                                                           | Shuangyu Wu   |                     |  |
-| Team collaboration features backend development           | Jialu Shen    | 20th, October, 2025    | In-progress |
-|                                                           | Yiman Li      |                     |  |
-| Advanced analytics and visualization frontend development | Yichen Li     | 20th, October, 2025    | In-progress |
-|                                                           | Luyao Huang   |                     |  |
-| Front and backend interconnection and software testing    | Yuchen Huang  | 10th, November, 2025   | In-progress |
-|                                                           | Heng Liu      |                     |  |
-| Technical document writing                                | Yulin Qiu     | 20th, November, 2025   | In-progress |
-|                                                           | Zuxin Wu      |                     |  |
-|                                                           | Shuangyu Wu   |                     |  |
-| Proof-of-concept software report writing                  | Yulin Qiu     | 23th, November, 2025   | In-progress |
-|                                                           | Zuxin Wu      |                     |  |
-|                                                           | Shuangyu Wu   |                     |  |
-| Software deployment and final presentation                | Yuchen Huang  | 26th, November, 2025   | In-progress |
-|                                                           | Heng Liu      |                     |  |
+| Action                                                    | Assigned to                                                             | Deadline              | Progress    |
+| --------------------------------------------------------- | ----------------------------------------------------------------------- | --------------------- | ----------- |
+| Project Proposal writing                                  | Heng Liu<br />Yuchen Huang<br />Yulin Qiu<br />Yiman Li<br />Jialu Shen | 22th, September, 2025 | Completed   |
+| White paper writing                                       | Yulin Qiu<br />Zuxin Wu<br />Shuangyu Wu                                | 13th, October, 2025   | In-progress |
+| Team collaboration features backend development           | Jialu Shen<br />Yiman Li                                                | 20th, October, 2025   | In-progress |
+| Advanced analytics and visualization frontend development | Yichen Li<br />Luyao Huang                                              | 20th, October, 2025   | In-progress |
+| Front and backend interconnection and software testing    | Yuchen Huang<br />Heng Liu                                              | 10th, November, 2025  | In-progress |
+| Technical document writing                                | Yulin Qiu<br />Zuxin Wu<br />Shuangyu Wu                                | 20th, November, 2025  | In-progress |
+| Proof-of-concept software report writing                  | Yulin Qiu<br />Zuxin Wu<br />Shuangyu Wu                                | 23th, November, 2025  | In-progress |
+| Software deployment and final presentation                | Yuchen Huang<br />Heng Liu                                              | 26th, November, 2025  | In-progress |
