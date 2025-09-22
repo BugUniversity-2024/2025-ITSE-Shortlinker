@@ -116,8 +116,8 @@ Objectives 1: Implement URL shortening and redirection functionality, build a ba
 | Requirement analysis and requirement documentation          | Heng Liu    | 22th, September, 2025  | Completed   |
 | Research on 8-character random string generation algorithms | Yichen Li   | 23th, September, 2025  | In-progress |
 |                                                             | Luyao Huang |                     |  |
-| Design of data model and database table structure           | Jialu Shen  | 25th, September, 2025  | In-progress |
-| API interface design and documentation                      | Yiman Li    | 25th, September, 2025  | In-progress |
+| Design of data model and database table structure           | Jialu Shen  | 24th, September, 2025  | In-progress |
+| API interface design and documentation                      | Yiman Li    | 24th, September, 2025  | In-progress |
 | Website architecture design complete                        | Heng Liu    | 25th, September, 2025  | In-progress |
 
 Objectives 2: Develop a user-friendly web interface for URL shortening and redirection, and implement basic analytics features.
