@@ -140,4 +140,4 @@ Objectives 3: Enhance the web interface with advanced features, including user a
 | Front and backend interconnection and software testing    | Yuchen Huang<br />Heng Liu                                              | 10th, November, 2025  | In-progress |
 | Technical document writing                                | Yulin Qiu<br />Zuxin Wu<br />Shuangyu Wu                                | 20th, November, 2025  | In-progress |
 | Proof-of-concept software report writing                  | Yulin Qiu<br />Zuxin Wu<br />Shuangyu Wu                                | 23th, November, 2025  | In-progress |
-| Software deployment and final presentation                | Yuchen Huang<br />Heng Liu                                              | 26th, November, 2025  | In-progress |
+| Software deployment and final presentation                | Yuchen Huang<br />Heng Liu<br />Lidian Huang                             | 26th, November, 2025  | In-progress |
