@@ -1,0 +1,19 @@
+# 浏览器支持配置
+# 用于Autoprefixer和其他工具
+
+# 现代浏览器
+Chrome >= 54
+ChromeAndroid >= 54
+Edge >= 79
+Firefox >= 60
+Safari >= 9
+iOS >= 9
+
+# 移动端浏览器
+Android >= 4.4
+Samsung >= 4
+
+# 不支持的浏览器
+not IE 11
+not dead
+not < 0.25%

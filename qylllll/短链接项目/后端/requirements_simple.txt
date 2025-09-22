@@ -1,0 +1,15 @@
+# 基础依赖（已安装）
+fastapi==0.116.2
+uvicorn==0.35.0
+sqlalchemy==2.0.43
+python-multipart==0.0.20
+
+# 简化版认证（无需Rust编译）
+python-dotenv==1.0.0
+
+# 测试框架
+pytest==7.4.3
+httpx==0.25.2
+
+# 实用工具
+requests==2.31.0
