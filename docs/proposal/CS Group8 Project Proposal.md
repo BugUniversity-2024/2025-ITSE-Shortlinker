@@ -99,7 +99,7 @@ Through the benefits, the shortlinkers gives a more convenient and cheap platfor
 ## Timeline
 
 | Phase  | Description                                               | End Date              |
-| ------ | --------------------------------------------------------- | -------------------------------------------------------- |
+| ------ | --------------------------------------------------------- | --------------------- |
 | Phase1 | Website architecture completed and project initialization | 16th, September, 2025 |
 | Phase2 | Research on shortening and redirection algorithms         | 26th, September, 2025 |
 | Phase3 | Front and backend separate development                    | 20th, October, 2025   |
@@ -121,7 +121,7 @@ Through the benefits, the shortlinkers gives a more convenient and cheap platfor
 
 **Objectives 2: Develop a user-friendly web interface for URL shortening and redirection, and implement basic analytics features.**
 
-| Action                                          | Assigned to  | Deadline             | Progress    |
+| Action                                  | Assigned to  | Deadline             | Progress    |
 | ----------------------------------------------- | ------------ | -------------------- | ----------- |
 | Frontend UI/UX design and prototype development | Yichen Li    | 10th, October, 2025  | In-progress |
 | Multi-database support implementation research  | Jialu Shen   | 13th, October, 2025  | In-progress |
@@ -131,9 +131,9 @@ Through the benefits, the shortlinkers gives a more convenient and cheap platfor
 
 **Objectives 3: Enhance the web interface with advanced features, including user account management, and detailed analytics.**
 
-| Action                                                    | Assigned to                                                             | Deadline              | Progress    |
-| --------------------------------------------------------- | ----------------------------------------------------------------------------- | --------------------- | ----------- |
-| Project Proposal writing                                  | Heng Liu<br />Yuchen Huang<br />Yulin Qiu<br />Yiman Li<br />Jialu Shen | 22th, September, 2025 | Completed   |
+| Action                                         | Assigned to                                                             | Deadline              | Progress    |
+| --------------------------------------------------------- | -------------------------------------------------------------------------- | --------------------- | ----------- |
+| Project Proposal writing                                  | Heng Liu<br /> Yuchen Huang<br />Yulin Qiu<br />Yiman Li<br />Jialu Shen | 22th, September, 2025 | Completed   |
 | White paper writing                                       | Yulin Qiu<br />Zuxin Wu<br />Shuangyu Wu                                | 13th, October, 2025   | In-progress |
 | Team collaboration features backend development           | Jialu Shen<br />Yiman Li                                                | 20th, October, 2025   | In-progress |
 | Advanced analytics and visualization frontend development | Yichen Li<br />Luyao Huang                                              | 20th, October, 2025   | In-progress |
