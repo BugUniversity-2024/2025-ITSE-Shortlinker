@@ -113,31 +113,46 @@ Objectives 1: Implement URL shortening and redirection functionality, build a ba
 
 | Action                                                      | Assigned to | Deadline | Progress    |
 | ----------------------------------------------------------- | ----------- | -------- | ----------- |
-| Requirement analysis and requirement documentation          |             | TBD      | Completed   |
-| Research on 8-character random string generation algorithms |             | TBD      | In-progress |
-| Design of data model and database table structure           |             | TBD      | In-progress |
-| API interface design and documentation                      |             | TBD      | In-progress |
-| Website architecture design complete                        |             | TBD      | In-progress |
+| Requirement analysis and requirement documentation          | Heng Liu    | 22th, September, 2025  | Completed   |
+| Research on 8-character random string generation algorithms | Yichen Li   | 23th, September, 2025  | In-progress |
+|                                                             | Luyao Huang |                     |  |
+| Design of data model and database table structure           | Jialu Shen  | 25th, September, 2025  | In-progress |
+| API interface design and documentation                      | Yiman Li    | 25th, September, 2025  | In-progress |
+| Website architecture design complete                        | Heng Liu    | 25th, September, 2025  | In-progress |
 
 Objectives 2: Develop a user-friendly web interface for URL shortening and redirection, and implement basic analytics features.
 
-| Action                                          | Assigned to | Deadline | Progress    |
-| ----------------------------------------------- | ----------- | -------- | ----------- |
-| Frontend UI/UX design and prototype development |             | TBD      | In-progress |
-| Multi-database support implementation research  |             | TBD      | In-progress |
-| Caching mechanism and Bloom filter design       |             | TBD      | In-progress |
-| Basic analytics data collection implementation  |             | TBD      | In-progress |
-| Performance optimization and testing            |             | TBD      | In-progress |
+| Action                                          |  Assigned to  |        Deadline      | Progress    |
+| ----------------------------------------------- | ------------- | -------------------- | ----------- |
+| Frontend UI/UX design and prototype development | Yichen Li     | 10th, October, 2025  | In-progress |
+| Multi-database support implementation research  | Jialu Shen    | 13th, October, 2025  | In-progress |
+| Caching mechanism and Bloom filter design       | Heng Liu      | 15th, October, 2025  | In-progress |
+| Basic analytics data collection implementation  | Yuchen Huang  | 20th, October, 2025  | In-progress |
+| Performance optimization and testing            | Yuchen Huang  | 10th, November, 2025 | In-progress |
 
 Objectives 3: Enhance the web interface with advanced features, including user account management, and detailed analytics.
 
 | Action                                                    | Assigned to | Deadline | Progress    |
 | --------------------------------------------------------- | ----------- | -------- | ----------- |
-| Project Proposal writing                                  |             | TBD      | Completed   |
-| White paper writing                                       |             | TBD      | In-progress |
-| Team collaboration features backend development           |             | TBD      | In-progress |
-| Advanced analytics and visualization frontend development |             | TBD      | In-progress |
-| Front and backend interconnection and software testing    |             | TBD      | In-progress |
-| Technical document writing                                |             | TBD      | In-progress |
-| Proof-of-concept software report writing                  |             | TBD      | In-progress |
-| Software deployment and final presentation                |             | TBD      | In-progress |
+| Project Proposal writing                                  | Heng Liu      | 22th, September, 2025  | Completed   |
+|                                                           | Yuchen Huang  |                     |  |
+|                                                           | Yulin Qiu     |                     |  |
+|                                                           | Yiman Li      |                     |  |
+|                                                           | Jialu Shen    |                     |  |
+| White paper writing                                       | Yulin Qiu     | 13th, October, 2025    | In-progress |
+|                                                           | Zuxin Wu      |                     |  |
+|                                                           | Shuangyu Wu   |                     |  |
+| Team collaboration features backend development           | Jialu Shen    | 20th, October, 2025    | In-progress |
+|                                                           | Yiman Li      |                     |  |
+| Advanced analytics and visualization frontend development | Yichen Li     | 20th, October, 2025    | In-progress |
+|                                                           | Luyao Huang   |                     |  |
+| Front and backend interconnection and software testing    | Yuchen Huang  | 10th, November, 2025   | In-progress |
+|                                                           | Heng Liu      |                     |  |
+| Technical document writing                                | Yulin Qiu     | 20th, November, 2025   | In-progress |
+|                                                           | Zuxin Wu      |                     |  |
+|                                                           | Shuangyu Wu   |                     |  |
+| Proof-of-concept software report writing                  | Yulin Qiu     | 23th, November, 2025   | In-progress |
+|                                                           | Zuxin Wu      |                     |  |
+|                                                           | Shuangyu Wu   |                     |  |
+| Software deployment and final presentation                | Yuchen Huang  | 26th, November, 2025   | In-progress |
+|                                                           | Heng Liu      |                     |  |
