@@ -18,7 +18,7 @@ In order to achieve this goal, we categorized the demands of the software into t
 
 ## 1.3 Market pain points
 
-Jack, a course-project lead at SCNU, faces challenges when sharing resources efficiently. He must distribute sign-up forms, slides, and materials across WeChat groups, Douyin profiles, and class forums. Long URLs hurt readability, are often truncated by character limits, and display inconsistently across platforms. QR code screenshots break when forwarded, and he lacks unified management tools, making it time-consuming to update links and respond to questions about "which link is the latest."
+Jack, a course-project leader at SCNU, faces challenges when sharing resources efficiently. He must distribute sign-up forms, slides, and materials across WeChat groups, Douyin profiles, and class forums. Long URLs hurt readability, are often truncated by character limits, and display inconsistently across platforms. QR code screenshots break when forwarded, and he lacks unified management tools, making it time-consuming to update links and respond to questions about "which link is the latest."
 
 TinyBridge is designed to address this gap in professional link management. Current methods lead to inefficiency—users can't track link performance, struggle with brand consistency across platforms, and face high costs with commercial solutions like Bitly ($199/month for advanced analytics). Free alternatives like TinyURL lack essential tracking capabilities.
 
@@ -55,10 +55,10 @@ The TinyBridge platform is a student-led project leveraging open-source technolo
 
 | Category | Details | Estimated Cost |
 |----------|---------|----------------|
-| Server Hosting | Cloud hosting for web application and database | $5 - $15/month |
+| Server Hosting | Cloud hosting for web application and database | $5 - $10/month |
 | Domain Registration | Custom domain for branding | $10 - $20/year |
 | SSL Certificate | Secure HTTPS (Let's Encrypt free) | $0 - $10/year |
-| Storage & CDN | Cloud storage for QR codes, landing page images | $5 - $15/month |
+| Storage & CDN | Cloud storage for landing page and images | $0 - $15/month |
 
 ### 1.6.3 Marketing and Promotion
 
@@ -77,8 +77,8 @@ The TinyBridge platform is a student-led project leveraging open-source technolo
 
 | Cost Breakdown | Monthly Estimate | Annual Estimate |
 |----------------|------------------|-----------------|
-| Low Estimate | $10/month | $120/year |
-| High Estimate | $80/month | $960/year |
+| Low Estimate | $8/month | $115/year |
+| High Estimate | $80/month | $955/year |
 
 ## 1.7 Market Research
 
