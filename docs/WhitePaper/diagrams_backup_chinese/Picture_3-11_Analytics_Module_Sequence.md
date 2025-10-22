@@ -3,144 +3,144 @@
 
 ```mermaid
 sequenceDiagram
-    participant Client as Client
-    participant Controller as AnalyticsController
-    participant Service as AnalyticsService
-    participant Repository as AnalyticsRepository
-    participant Redis as Cache
-    participant DB as Database
+    participant Client as 客户端<br>Client
+    participant Controller as 控制器<br>AnalyticsController
+    participant Service as 服务层<br>AnalyticsService
+    participant Repository as 仓储层<br>AnalyticsRepository
+    participant Redis as Redis<br>缓存
+    participant DB as PostgreSQL<br>数据库
 
-    Note over Client,DB: Get Link Analytics
+    Note over Client,DB: 获取链接分析数据 Get Link Analytics
 
     Client->>Controller: GET /api/analytics/:link_id?range=7d
-    Controller->>Controller: Verify JWT
-    Controller->>Controller: Verify Link Ownership
+    Controller->>Controller: 验证 JWT<br>Verify JWT
+    Controller->>Controller: 验证权限<br>Verify Link Ownership
 
     Controller->>Service: getAnalytics(link_id, user_id, range)
 
-    Service->>Controller: (7d → start/end dates)
+    Service->>Service: 解析时间范围<br>Parse Date Range<br>(7d → start/end dates)
 
     Service->>Redis: GET analytics:{link_id}:range:{start}-{end}
-    alt Cache Hit
+    alt 缓存命中 Cache Hit
         Redis-->>Service: Cached Analytics Data
         Service-->>Controller: Analytics Result
-        Controller-->>Controller: {analytics: {...}}
-    else Cache Miss
+        Controller-->>Client: 200 OK<br>{analytics: {...}}
+    else 缓存未命中 Cache Miss
         Service->>Repository: getClickLogs(link_id, start_date, end_date)
-        Repository->>Controller: AND clicked_at BETWEEN ? AND ?<br>ORDER BY clicked_at
+        Repository->>DB: SELECT * FROM click_logs<br>WHERE link_id = ?<br>AND clicked_at BETWEEN ? AND ?<br>ORDER BY clicked_at
         DB-->>Repository: Click Logs Array
         Repository-->>Service: Raw Click Data
 
-        Service->>Controller: Aggregate Time Trends
-        Service->>Controller: Aggregate Geographic Data
-        Service->>Controller: Aggregate Device Types
-        Service->>Controller: Aggregate Browser/OS
-        Service->>Controller: Aggregate Referrer Data
+        Service->>Service: 聚合时间趋势<br>Aggregate Time Trends
+        Service->>Service: 聚合地理分布<br>Aggregate Geographic Data
+        Service->>Service: 聚合设备类型<br>Aggregate Device Types
+        Service->>Service: 聚合浏览器/OS<br>Aggregate Browser/OS
+        Service->>Service: 聚合来源分析<br>Aggregate Referrer Data
 
-        Service->>Controller: TTL: 1h
+        Service->>Redis: SET analytics:{link_id}:range:{start}-{end}<br>aggregated_data<br>TTL: 1h
         Redis-->>Service: OK
 
         Service-->>Controller: Analytics Result
-        Controller-->>Controller: {analytics: {...}}
+        Controller-->>Client: 200 OK<br>{analytics: {...}}
     end
 
-    Note over Client,DB: Time Trends Aggregation
+    Note over Client,DB: 时间趋势聚合 Time Trends Aggregation
 
     Service->>Repository: aggregateByHour(link_id, start, end)
-    Repository->>Controller:   COUNT(*) as clicks<br>FROM click_logs<br>WHERE link_id = ?<br>  AND clicked_at BETWEEN ? AND ?<br>GROUP BY hour<br>ORDER BY hour
+    Repository->>DB: SELECT<br>  DATE_TRUNC('hour', clicked_at) as hour,<br>  COUNT(*) as clicks<br>FROM click_logs<br>WHERE link_id = ?<br>  AND clicked_at BETWEEN ? AND ?<br>GROUP BY hour<br>ORDER BY hour
     DB-->>Repository: Hourly Clicks Data
     Repository-->>Service: [{hour: '2025-01-10 14:00', clicks: 245}, ...]
 
-    Service->>Controller: Format for Chart.js
-    Service-->>Controller: {}
+    Service->>Service: 格式化为图表数据<br>Format for Chart.js
+    Service-->>Controller: {<br>  labels: ['14:00', '15:00', ...],<br>  data: [245, 389, ...]<br>}
 
-    Note over Client,DB: Geographic Distribution
+    Note over Client,DB: 地理分布聚合 Geographic Distribution
 
     Service->>Repository: aggregateByCountry(link_id, start, end)
-    Repository->>Controller:   city,<br>  COUNT(*) as clicks<br>FROM click_logs<br>WHERE link_id = ?<br>  AND clicked_at BETWEEN ? AND ?<br>GROUP BY country, city<br>ORDER BY clicks DESC<br>LIMIT 20
+    Repository->>DB: SELECT<br>  country,<br>  city,<br>  COUNT(*) as clicks<br>FROM click_logs<br>WHERE link_id = ?<br>  AND clicked_at BETWEEN ? AND ?<br>GROUP BY country, city<br>ORDER BY clicks DESC<br>LIMIT 20
     DB-->>Repository: Geographic Data
     Repository-->>Service: [{country: 'China', city: 'Guangzhou', clicks: 1247}, ...]
 
-    Service->>Controller: Calculate Percentages
-    Service-->>Controller:   'USA': {clicks: 1234, percentage: 23.8%},<br>  ...<br>}
+    Service->>Service: 计算百分比<br>Calculate Percentages
+    Service-->>Controller: {<br>  'China': {clicks: 2345, percentage: 45.2%},<br>  'USA': {clicks: 1234, percentage: 23.8%},<br>  ...<br>}
 
-    Note over Client,DB: Device Type Distribution
+    Note over Client,DB: 设备类型聚合 Device Type Distribution
 
     Service->>Repository: aggregateByDevice(link_id, start, end)
-    Repository->>Controller:   COUNT(*) as clicks<br>FROM click_logs<br>WHERE link_id = ?<br>  AND clicked_at BETWEEN ? AND ?<br>GROUP BY device_type
+    Repository->>DB: SELECT<br>  device_type,<br>  COUNT(*) as clicks<br>FROM click_logs<br>WHERE link_id = ?<br>  AND clicked_at BETWEEN ? AND ?<br>GROUP BY device_type
     DB-->>Repository: Device Data
     Repository-->>Service: [{device_type: 'mobile', clicks: 3456}, ...]
 
-    Service->>Controller: Calculate Distribution
-    Service-->>Controller: {}
+    Service->>Service: 计算占比<br>Calculate Distribution
+    Service-->>Controller: {<br>  'mobile': 67.8%,<br>  'desktop': 28.5%,<br>  'tablet': 3.7%<br>}
 
-    Note over Client,DB: Browser/OS Distribution
+    Note over Client,DB: 浏览器/操作系统聚合 Browser/OS Distribution
 
     Service->>Repository: aggregateByBrowser(link_id, start, end)
-    Repository->>Controller:   os,<br>  COUNT(*) as clicks<br>FROM click_logs<br>WHERE link_id = ?<br>  AND clicked_at BETWEEN ? AND ?<br>GROUP BY browser, os<br>ORDER BY clicks DESC
+    Repository->>DB: SELECT<br>  browser,<br>  os,<br>  COUNT(*) as clicks<br>FROM click_logs<br>WHERE link_id = ?<br>  AND clicked_at BETWEEN ? AND ?<br>GROUP BY browser, os<br>ORDER BY clicks DESC
     DB-->>Repository: Browser/OS Data
     Repository-->>Service: [{browser: 'Chrome', os: 'Android', clicks: 2345}, ...]
 
-    Service->>Controller: Format Data
-    Service-->>Controller:   os: {Android: 40%, iOS: 35%, ...}<br>}
+    Service->>Service: 格式化数据<br>Format Data
+    Service-->>Controller: {<br>  browsers: {Chrome: 45%, Safari: 30%, ...},<br>  os: {Android: 40%, iOS: 35%, ...}<br>}
 
-    Note over Client,DB: Referrer Analysis
+    Note over Client,DB: 来源分析 Referrer Analysis
 
     Service->>Repository: aggregateByReferrer(link_id, start, end)
-    Repository->>Controller:     WHEN referrer IS NULL THEN 'Direct'<br>    WHEN referrer LIKE '%weixin%' THEN 'WeChat'<br>    WHEN referrer LIKE '%weibo%' THEN 'Weibo'<br>    WHEN referrer LIKE '%google%' THEN 'Search'<br>    ELSE 'Other'<br>  END as source,<br>  COUNT(*) as clicks<br>FROM click_logs<br>WHERE link_id = ?<br>  AND clicked_at BETWEEN ? AND ?<br>GROUP BY source<br>ORDER BY clicks DESC
+    Repository->>DB: SELECT<br>  CASE<br>    WHEN referrer IS NULL THEN 'Direct'<br>    WHEN referrer LIKE '%weixin%' THEN 'WeChat'<br>    WHEN referrer LIKE '%weibo%' THEN 'Weibo'<br>    WHEN referrer LIKE '%google%' THEN 'Search'<br>    ELSE 'Other'<br>  END as source,<br>  COUNT(*) as clicks<br>FROM click_logs<br>WHERE link_id = ?<br>  AND clicked_at BETWEEN ? AND ?<br>GROUP BY source<br>ORDER BY clicks DESC
     DB-->>Repository: Referrer Data
     Repository-->>Service: [{source: 'WeChat', clicks: 2345}, ...]
 
-    Service->>Controller: Calculate Percentages
-    Service-->>Controller: {}
+    Service->>Service: 计算占比<br>Calculate Percentages
+    Service-->>Controller: {<br>  'WeChat': 45.2%,<br>  'Direct': 30.8%,<br>  'Weibo': 15.3%,<br>  ...<br>}
 
-    Note over Client,DB: Export Analytics Data
+    Note over Client,DB: 导出分析数据 Export Analytics Data
 
     Client->>Controller: GET /api/analytics/:link_id/export?format=csv
-    Controller->>Controller: Verify JWT
-    Controller->>Controller: Verify Ownership
+    Controller->>Controller: 验证 JWT<br>Verify JWT
+    Controller->>Controller: 验证权限<br>Verify Ownership
 
     Controller->>Service: exportAnalytics(link_id, user_id, format)
 
     Service->>Repository: getClickLogs(link_id, start, end)
-    Repository->>Controller:   country,<br>  city,<br>  device_type,<br>  browser,<br>  os,<br>  referrer<br>FROM click_logs<br>WHERE link_id = ?<br>ORDER BY clicked_at DESC
+    Repository->>DB: SELECT<br>  clicked_at,<br>  country,<br>  city,<br>  device_type,<br>  browser,<br>  os,<br>  referrer<br>FROM click_logs<br>WHERE link_id = ?<br>ORDER BY clicked_at DESC
     DB-->>Repository: Click Logs Array
     Repository-->>Service: Raw Data
 
     alt CSV 格式 CSV Format
-        Service->>Controller: Convert to CSV
+        Service->>Service: 转换为 CSV<br>Convert to CSV
         Service-->>Controller: CSV String
-        Controller-->>Controller: clicked_at,country,city,...<br>2025-01-10 14:32,China,Guangzhou,...
+        Controller-->>Client: 200 OK<br>Content-Type: text/csv<br>clicked_at,country,city,...<br>2025-01-10 14:32,China,Guangzhou,...
     else JSON 格式 JSON Format
-        Service->>Controller: Format as JSON
+        Service->>Service: 格式化 JSON<br>Format as JSON
         Service-->>Controller: JSON Array
-        Controller-->>Controller: [{clicked_at: '...', country: '...', ...}, ...]
+        Controller-->>Client: 200 OK<br>Content-Type: application/json<br>[{clicked_at: '...', country: '...', ...}, ...]
     end
 
-    Note over Client,DB: Real-time Statistics
+    Note over Client,DB: 实时统计 Real-time Statistics
 
     Client->>Controller: GET /api/analytics/:link_id/realtime
-    Controller->>Controller: Verify JWT
+    Controller->>Controller: 验证 JWT<br>Verify JWT
 
     Controller->>Service: getRealtimeStats(link_id, user_id)
 
     Service->>Redis: GET realtime:{link_id}:last_5min
-    alt Cache Exists
+    alt 缓存存在 Cache Exists
         Redis-->>Service: Cached Stats
         Service-->>Controller: Realtime Stats
-    else Cache Miss
+    else 缓存不存在 Cache Miss
         Service->>Repository: getClickLogs(link_id, last_5min)
-        Repository->>Controller: WHERE link_id = ?<br>  AND clicked_at >= NOW() - INTERVAL '5 minutes'
+        Repository->>DB: SELECT COUNT(*) as clicks<br>FROM click_logs<br>WHERE link_id = ?<br>  AND clicked_at >= NOW() - INTERVAL '5 minutes'
         DB-->>Repository: Click Count
         Repository-->>Service: Realtime Data
 
-        Service->>Controller: TTL: 1min
+        Service->>Redis: SET realtime:{link_id}:last_5min<br>stats<br>TTL: 1min
         Redis-->>Service: OK
 
         Service-->>Controller: Realtime Stats
     end
 
-    Controller-->>Controller: {}
+    Controller-->>Client: 200 OK<br>{<br>  last_5min: 23,<br>  last_hour: 245,<br>  today: 1247<br>}
 
     style Client fill:#E3F2FD
     style Controller fill:#C8E6C9
@@ -504,7 +504,7 @@ import { Parser } from 'json2csv'
 async function exportAnalytics(
   linkId: number,
   userId: number,
-  format: 'csv' |'json',
+  format: 'csv' | 'json',
   startDate: Date,
   endDate: Date
 ) {
@@ -593,23 +593,23 @@ async function getRealtimeStats(linkId: number) {
 
 ### 🔒 缓存策略
 
-| 缓存类型 |Key 格式 | TTL |说明 |
+| 缓存类型 | Key 格式 | TTL | 说明 |
 |----------|----------|-----|------|
-| **聚合分析数据** | `analytics:{link_id}:range:{start}-{end}` | 1h |完整的分析结果 |
-|**实时统计** | `realtime:{link_id}:last_5min` | 1min | 实时统计数据 |
-| **导出数据** |不缓存 | - |每次查询数据库 |
+| **聚合分析数据** | `analytics:{link_id}:range:{start}-{end}` | 1h | 完整的分析结果 |
+| **实时统计** | `realtime:{link_id}:last_5min` | 1min | 实时统计数据 |
+| **导出数据** | 不缓存 | - | 每次查询数据库 |
 
 ---
 
 ### ⚡ 性能优化
 
-|策略 | 效果 |
+| 策略 | 效果 |
 |------|------|
-| **数据库索引** |`(link_id, clicked_at)` 复合索引 |
-|**聚合缓存** | Redis 缓存 1 小时,减少 90% 查询 |
-| **分区表** |按月分区 `click_logs`,提升查询速度 |
-|**数据归档** | 90 天后归档到冷存储 |
-| **异步聚合** |夜间预聚合常用时间范围 |
+| **数据库索引** | `(link_id, clicked_at)` 复合索引 |
+| **聚合缓存** | Redis 缓存 1 小时,减少 90% 查询 |
+| **分区表** | 按月分区 `click_logs`,提升查询速度 |
+| **数据归档** | 90 天后归档到冷存储 |
+| **异步聚合** | 夜间预聚合常用时间范围 |
 
 ---
 

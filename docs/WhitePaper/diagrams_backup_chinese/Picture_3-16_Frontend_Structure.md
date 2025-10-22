@@ -4,52 +4,52 @@
 ```mermaid
 graph TB
     subgraph "路由层 Router Layer"
-        Router[路由管理器]
+        Router[Vue Router<br>路由管理器]
     end
 
     subgraph "页面层 Pages Layer"
-        Login[LoginPage.vue]
-        Dashboard[Dashboard.vue]
-        LinkList[LinkList.vue]
-        LinkCreate[LinkCreate.vue]
-        Analytics[Analytics.vue]
-        LandingEditor[LandingPageEditor.vue]
-        Team[TeamManagement.vue]
-        Settings[Settings.vue]
+        Login[登录/注册页<br>LoginPage.vue]
+        Dashboard[仪表板<br>Dashboard.vue]
+        LinkList[链接列表<br>LinkList.vue]
+        LinkCreate[创建链接<br>LinkCreate.vue]
+        Analytics[数据分析<br>Analytics.vue]
+        LandingEditor[落地页编辑器<br>LandingPageEditor.vue]
+        Team[团队管理<br>TeamManagement.vue]
+        Settings[用户设置<br>Settings.vue]
     end
 
     subgraph "组件层 Components Layer"
-        Header[Header.vue]
-        Sidebar[Sidebar.vue]
-        LinkCard[LinkCard.vue]
-        QRCode[QRCodeGenerator.vue]
-        Charts[ChartComponents.vue]
-        Modal[Modal.vue]
-        Form[FormComponents.vue]
-        CodeEditor[MonacoEditor.vue]
+        Header[导航栏<br>Header.vue]
+        Sidebar[侧边栏<br>Sidebar.vue]
+        LinkCard[链接卡片<br>LinkCard.vue]
+        QRCode[二维码组件<br>QRCodeGenerator.vue]
+        Charts[图表组件<br>ChartComponents.vue]
+        Modal[模态框<br>Modal.vue]
+        Form[表单组件<br>FormComponents.vue]
+        CodeEditor[代码编辑器<br>MonacoEditor.vue]
     end
 
     subgraph "状态管理层 State Management"
         Pinia[Pinia Store]
-        UserStore[userStore.ts]
-        LinkStore[linkStore.ts]
-        TeamStore[teamStore.ts]
-        UIStore[uiStore.ts]
+        UserStore[用户状态<br>userStore.ts]
+        LinkStore[链接状态<br>linkStore.ts]
+        TeamStore[团队状态<br>teamStore.ts]
+        UIStore[UI状态<br>uiStore.ts]
     end
 
     subgraph "服务层 Service Layer"
-        API[Axios Instance]
-        AuthAPI[authService.ts]
-        LinkAPI[linkService.ts]
-        AnalyticsAPI[analyticsService.ts]
-        TeamAPI[teamService.ts]
+        API[API 客户端<br>Axios Instance]
+        AuthAPI[认证服务<br>authService.ts]
+        LinkAPI[链接服务<br>linkService.ts]
+        AnalyticsAPI[分析服务<br>analyticsService.ts]
+        TeamAPI[团队服务<br>teamService.ts]
     end
 
     subgraph "工具层 Utils Layer"
-        Validators[validators.ts]
-        Formatters[formatters.ts]
-        Storage[localStorage.ts]
-        Clipboard[clipboard.ts]
+        Validators[验证工具<br>validators.ts]
+        Formatters[格式化工具<br>formatters.ts]
+        Storage[本地存储<br>localStorage.ts]
+        Clipboard[剪贴板<br>clipboard.ts]
     end
 
     Router --> Login
@@ -116,7 +116,7 @@ graph TB
 
 ### 🏗️ 技术栈
 
-|层级 | 技术 |说明 |
+| 层级 | 技术 | 说明 |
 |------|------|------|
 | **框架** | Vue 3 (Composition API) | 渐进式前端框架 |
 | **构建工具** | Vite | 快速热更新,优化打包 |
@@ -126,7 +126,9 @@ graph TB
 | **HTTP 客户端** | Axios | Promise 风格的 HTTP 库 |
 | **图表库** | Chart.js | 数据可视化 |
 | **代码编辑器** | Monaco Editor | VS Code 同款编辑器 |
-| **表单验证** | Vuelidate / Zod | 响应式表单验证 |---
+| **表单验证** | Vuelidate / Zod | 响应式表单验证 |
+
+---
 
 ### 📁 项目目录结构
 
@@ -383,7 +385,7 @@ import { useUserStore } from '@/stores/user'
 import router from '@/router'
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL ||'http://localhost:3000/api',
+  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api',
   timeout: 10000
 })
 
@@ -478,7 +480,7 @@ import { ref } from 'vue'
 interface Toast {
   id: number
   message: string
-  type: 'success' | 'error' |'info'
+  type: 'success' | 'error' | 'info'
 }
 
 const toasts = ref<Toast[]>([])
@@ -698,11 +700,11 @@ export default {
 
 ### ⚡ 性能优化
 
-| 策略 |实现方式 |
+| 策略 | 实现方式 |
 |------|----------|
-| **路由懒加载** |`() => import()` 动态导入 |
-|**组件懒加载** | `defineAsyncComponent` |
-| **图片懒加载** |`v-lazy` 指令 |
-|**代码分割** | Vite 自动分割 |
+| **路由懒加载** | `() => import()` 动态导入 |
+| **组件懒加载** | `defineAsyncComponent` |
+| **图片懒加载** | `v-lazy` 指令 |
+| **代码分割** | Vite 自动分割 |
 | **缓存策略** | Service Worker (PWA) |
 | **Tree Shaking** | Vite 自动优化 |

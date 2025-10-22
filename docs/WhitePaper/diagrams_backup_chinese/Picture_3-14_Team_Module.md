@@ -5,23 +5,23 @@
 graph TB
     subgraph "团队模块 Team Module"
         subgraph "控制器层 Controller Layer"
-            TeamController[TeamController]
+            TeamController[团队控制器<br>TeamController]
         end
 
         subgraph "服务层 Service Layer"
-            TeamService[TeamService]
-            InviteService[InviteService]
-            PermissionService[PermissionService]
+            TeamService[团队服务<br>TeamService]
+            InviteService[邀请服务<br>InviteService]
+            PermissionService[权限服务<br>PermissionService]
         end
 
         subgraph "仓储层 Repository Layer"
-            TeamRepository[TeamRepository]
-            MemberRepository[MemberRepository]
+            TeamRepository[团队仓储<br>TeamRepository]
+            MemberRepository[成员仓储<br>MemberRepository]
         end
 
         subgraph "工具组件 Utilities"
-            InviteCodeGenerator[InviteCodeGenerator]
-            RoleValidator[RoleValidator]
+            InviteCodeGenerator[邀请码生成器<br>InviteCodeGenerator]
+            RoleValidator[角色验证器<br>RoleValidator]
         end
     end
 
@@ -54,7 +54,7 @@ graph TB
 
     TeamRepository -->|读写| Database
     MemberRepository -->|读写| Database
-    TeamRepository -->|缓存|Redis
+    TeamRepository -->|缓存| Redis
 
     style TeamController fill:#3B82F6,color:#fff
     style TeamService fill:#FFF9C4
@@ -71,13 +71,15 @@ graph TB
 
 ## 角色权限
 
-| 角色 |邀请成员 | 移除成员 |修改角色 | 删除团队 |
+| 角色 | 邀请成员 | 移除成员 | 修改角色 | 删除团队 |
 |------|----------|----------|----------|----------|
 | Owner | ✅ | ✅ | ✅ | ✅ |
 | Admin | ✅ | ✅ | ❌ | ❌ |
-| Member | ❌ | ❌ | ❌ | ❌ |## API 端点
+| Member | ❌ | ❌ | ❌ | ❌ |
 
-| 方法 |路径 | 说明 |
+## API 端点
+
+| 方法 | 路径 | 说明 |
 |------|------|------|
 | POST | /api/teams | 创建团队 |
 | GET | /api/teams | 获取用户团队列表 |

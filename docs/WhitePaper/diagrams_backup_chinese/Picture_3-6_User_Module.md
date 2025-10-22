@@ -5,29 +5,29 @@
 graph TB
     subgraph "用户模块 User Module"
         subgraph "控制器层 Controller Layer"
-            AuthController[AuthController]
-            UserController[UserController]
+            AuthController[认证控制器<br>AuthController]
+            UserController[用户控制器<br>UserController]
         end
 
         subgraph "服务层 Service Layer"
-            AuthService[AuthService]
-            UserService[UserService]
-            EmailService[EmailService]
+            AuthService[认证服务<br>AuthService]
+            UserService[用户服务<br>UserService]
+            EmailService[邮件服务<br>EmailService]
         end
 
         subgraph "仓储层 Repository Layer"
-            UserRepository[UserRepository]
+            UserRepository[用户仓储<br>UserRepository]
         end
 
         subgraph "工具组件 Utilities"
-            JWTUtil[JWT Utility]
-            Argon2Util[Argon2 Utility]
-            ValidationUtil[Validation Utility]
+            JWTUtil[JWT工具<br>JWT Utility]
+            Argon2Util[Argon2工具<br>Argon2 Utility]
+            ValidationUtil[验证工具<br>Validation Utility]
         end
     end
 
-    Client([Client])
-    Database[Database)]
+    Client([客户端<br>Client])
+    Database[(数据库<br>Database)]
     Redis[(Redis)]
 
     Client -->|POST /api/auth/register| AuthController
@@ -50,7 +50,7 @@ graph TB
     UserService -->|验证输入| ValidationUtil
 
     UserRepository -->|读写| Database
-    UserRepository -->|缓存|Redis
+    UserRepository -->|缓存| Redis
 
     style AuthController fill:#3B82F6,color:#fff
     style UserController fill:#3B82F6,color:#fff

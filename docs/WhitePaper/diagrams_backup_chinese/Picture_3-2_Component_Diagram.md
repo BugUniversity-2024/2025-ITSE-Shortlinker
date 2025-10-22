@@ -4,75 +4,75 @@
 ```mermaid
 graph TB
     subgraph "客户端层 Client Layer"
-        WebApp[Vue 3 + Vite]
-        MobileApp[Responsive Design]
+        WebApp[Web 应用<br>Vue 3 + Vite]
+        MobileApp[移动端<br>Responsive Design]
     end
 
     subgraph "接入层 Gateway Layer"
-        Nginx[反向代理 + 负载均衡]
-        RateLimit[Rate Limiter]
+        Nginx[Nginx<br>反向代理 + 负载均衡]
+        RateLimit[速率限制<br>Rate Limiter]
     end
 
     subgraph "应用层 Application Layer"
         subgraph "API 网关 API Gateway"
-            Router[Express Router]
-            AuthMiddleware[JWT Verifier]
-            ErrorHandler[Error Handler]
+            Router[路由层<br>Express Router]
+            AuthMiddleware[认证中间件<br>JWT Verifier]
+            ErrorHandler[错误处理<br>Error Handler]
         end
 
         subgraph "业务逻辑层 Business Logic"
-            UserController[UserController]
-            LinkController[LinkController]
-            AnalyticsController[AnalyticsController]
-            LandingController[LandingPageController]
-            TeamController[TeamController]
+            UserController[用户控制器<br>UserController]
+            LinkController[链接控制器<br>LinkController]
+            AnalyticsController[分析控制器<br>AnalyticsController]
+            LandingController[落地页控制器<br>LandingPageController]
+            TeamController[团队控制器<br>TeamController]
 
-            UserService[UserService]
-            LinkService[LinkService]
-            AnalyticsService[AnalyticsService]
-            LandingService[LandingPageService]
-            TeamService[TeamService]
+            UserService[用户服务<br>UserService]
+            LinkService[链接服务<br>LinkService]
+            AnalyticsService[分析服务<br>AnalyticsService]
+            LandingService[落地页服务<br>LandingPageService]
+            TeamService[团队服务<br>TeamService]
         end
 
         subgraph "数据访问层 Data Access"
-            UserRepo[UserRepository]
-            LinkRepo[LinkRepository]
-            AnalyticsRepo[AnalyticsRepository]
-            LandingRepo[LandingPageRepository]
-            TeamRepo[TeamRepository]
+            UserRepo[用户仓储<br>UserRepository]
+            LinkRepo[链接仓储<br>LinkRepository]
+            AnalyticsRepo[分析仓储<br>AnalyticsRepository]
+            LandingRepo[落地页仓储<br>LandingPageRepository]
+            TeamRepo[团队仓储<br>TeamRepository]
         end
     end
 
     subgraph "基础设施层 Infrastructure Layer"
         subgraph "缓存服务 Cache Service"
-            RedisClient[ioredis]
-            CacheManager[CacheManager]
-            BloomFilter[Bloom Filter]
+            RedisClient[Redis 客户端<br>ioredis]
+            CacheManager[缓存管理器<br>CacheManager]
+            BloomFilter[布隆过滤器<br>Bloom Filter]
         end
 
         subgraph "数据库服务 Database Service"
-            DBPool[PostgreSQL Pool]
-            QueryBuilder[Prisma/TypeORM]
+            DBPool[连接池<br>PostgreSQL Pool]
+            QueryBuilder[查询构建器<br>Prisma/TypeORM]
         end
 
         subgraph "外部服务 External Services"
-            EmailClient[Nodemailer]
-            GeoIPClient[geoip-lite]
-            QRCodeGen[qrcode.js]
+            EmailClient[邮件客户端<br>Nodemailer]
+            GeoIPClient[地理定位<br>geoip-lite]
+            QRCodeGen[二维码生成<br>qrcode.js]
         end
 
         subgraph "工具组件 Utility Components"
-            Logger[Winston]
-            Validator[Zod]
-            Sanitizer[DOMPurify]
-            Crypto[Argon2 + SHA256]
+            Logger[日志组件<br>Winston]
+            Validator[验证组件<br>Zod]
+            Sanitizer[清理组件<br>DOMPurify]
+            Crypto[加密组件<br>Argon2 + SHA256]
         end
     end
 
     subgraph "数据层 Data Layer"
-        PostgreSQL[主数据库)]
-        Redis[缓存)]
-        FileSystem[Local/OSS)]
+        PostgreSQL[(PostgreSQL<br>主数据库)]
+        Redis[(Redis<br>缓存)]
+        FileSystem[(文件系统<br>Local/OSS)]
     end
 
     WebApp --> Nginx
@@ -256,11 +256,13 @@ async function rateLimitMiddleware(req, res, next) {
 ```
 
 **限流策略**:
-|用户类型 | 限制 |说明 |
+| 用户类型 | 限制 | 说明 |
 |----------|------|------|
 | **匿名用户** | 10 req/min | 仅允许访问短链接 |
 | **普通用户** | 100 req/min | 正常使用 |
-| **API 客户端** | 1,000 req/hour | 批量操作 |---
+| **API 客户端** | 1,000 req/hour | 批量操作 |
+
+---
 
 ### 3️⃣ 应用层 (Application Layer)
 
@@ -369,7 +371,7 @@ class LinkService {
     }
 
     // 2. 生成短码
-    const shortCode = data.custom_code ||generateShortCode()
+    const shortCode = data.custom_code || generateShortCode()
 
     // 3. 检查冲突
     const exists = await this.checkExists(shortCode)
@@ -553,7 +555,7 @@ function getLocation(ip) {
   const geo = geoip.lookup(ip)
   return {
     country: geo?.country || 'Unknown',
-    city: geo?.city ||'Unknown',
+    city: geo?.city || 'Unknown',
     latitude: geo?.ll?.[0],
     longitude: geo?.ll?.[1]
   }
@@ -646,18 +648,20 @@ function hashIP(ip, salt) {
 
 ### 📊 组件性能指标
 
-| 组件 |响应时间 | 吞吐量 |
+| 组件 | 响应时间 | 吞吐量 |
 |------|----------|--------|
 | **Nginx** | < 5ms | 10,000 req/s |
 | **速率限制** | < 1ms | - |
 | **JWT 验证** | < 2ms | - |
 | **Redis 缓存** | < 1ms | 50,000 ops/s |
 | **PostgreSQL** | < 10ms | 1,000 qps |
-| **布隆过滤器** | < 0.1ms | 1,000,000 ops/s |---
+| **布隆过滤器** | < 0.1ms | 1,000,000 ops/s |
+
+---
 
 ### 🔧 组件可替换性
 
-| 组件 |当前实现 | 可替换选项 |
+| 组件 | 当前实现 | 可替换选项 |
 |------|----------|-----------|
 | **数据库** | PostgreSQL | MySQL, MongoDB |
 | **缓存** | Redis | Memcached |

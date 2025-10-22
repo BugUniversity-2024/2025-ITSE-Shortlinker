@@ -3,175 +3,175 @@
 
 ```mermaid
 sequenceDiagram
-    participant Client as Client
-    participant Controller as LinkController
-    participant Service as LinkService
-    participant Repository as LinkRepository
-    participant Bloom as 冲突检测
-    participant Redis as Cache
-    participant DB as Database
+    participant Client as 客户端<br>Client
+    participant Controller as 控制器<br>LinkController
+    participant Service as 服务层<br>LinkService
+    participant Repository as 仓储层<br>LinkRepository
+    participant Bloom as Bloom Filter<br>冲突检测
+    participant Redis as Redis<br>缓存
+    participant DB as PostgreSQL<br>数据库
 
-    Note over Client,DB: Create Short Link Flow
+    Note over Client,DB: 创建短链接流程 Create Short Link Flow
 
-    Client->>Controller: {original_url, custom_code?}
-    Controller->>Controller: Verify JWT
-    Controller->>Controller: Validate URL
+    Client->>Controller: POST /api/links<br>{original_url, custom_code?}
+    Controller->>Controller: 验证 JWT<br>Verify JWT
+    Controller->>Controller: 验证 URL 格式<br>Validate URL
 
     Controller->>Service: createLink(user_id, data)
 
-    alt Custom Code
-        Service->>Controller: Validate Code Format
-        Service->>Controller: Check Code Exists
-        Bloom-->>Service: false
+    alt 自定义短码 Custom Code
+        Service->>Service: 验证短码格式<br>Validate Code Format
+        Service->>Bloom: 检查短码是否存在<br>Check Code Exists
+        Bloom-->>Service: false (不存在)
 
         Service->>Repository: findByShortCode(custom_code)
-        Repository->>Controller: WHERE short_code = ?
+        Repository->>DB: SELECT * FROM short_links<br>WHERE short_code = ?
         DB-->>Repository: null
         Repository-->>Service: null
 
-        Service->>Controller: Use Custom Code
-    else Random Code
-        Service->>Controller: Generate Random ID
-        Service->>Controller: Base62 Encode
+        Service->>Service: 使用自定义短码<br>Use Custom Code
+    else 随机生成 Random Code
+        Service->>Service: 生成随机 ID<br>Generate Random ID
+        Service->>Service: Base62 编码<br>Base62 Encode
 
-        loop Collision Detection
-            Service->>Controller: Check Code
+        loop 冲突检测 Collision Detection
+            Service->>Bloom: 检查短码<br>Check Code
             Bloom-->>Service: exists?
-            alt Exists
-                Service->>Controller: Regenerate
-            else Not Exists
-                Service->>Controller: Use This Code
+            alt 存在 Exists
+                Service->>Service: 重新生成<br>Regenerate
+            else 不存在 Not Exists
+                Service->>Service: 使用该短码<br>Use This Code
             end
         end
     end
 
     Service->>Repository: create({user_id, original_url, short_code})
-    Repository->>Controller: (created_at, is_active: true)
+    Repository->>DB: INSERT INTO short_links<br>(user_id, original_url, short_code,<br>created_at, is_active: true)
     DB-->>Repository: Link ID: 67890
     Repository-->>Service: Link Object
 
-    Service->>Controller: Add Code to Bloom
+    Service->>Bloom: 添加短码<br>Add Code to Bloom
     Bloom-->>Service: OK
 
-    Service->>Controller: TTL: 24h
+    Service->>Redis: SET link:{short_code}<br>original_url<br>TTL: 24h
     Redis-->>Service: OK
 
     Service-->>Controller: {short_url, original_url, short_code}
-    Controller-->>Controller: {link: {...}}
+    Controller-->>Client: 201 Created<br>{link: {...}}
 
-    Note over Client,DB: Redirect Flow
+    Note over Client,DB: 重定向流程 Redirect Flow
 
     Client->>Controller: GET /:short_code
     Controller->>Service: redirect(short_code)
 
     Service->>Redis: GET link:{short_code}
-    alt Cache Hit
+    alt 缓存命中 Cache Hit
         Redis-->>Service: original_url
-        Service->>Controller: Async Log Click
-    else Cache Miss
+        Service->>Service: 异步记录点击<br>Async Log Click
+    else 缓存未命中 Cache Miss
         Service->>Repository: findByShortCode(short_code)
-        Repository->>Controller: AND is_active = true
+        Repository->>DB: SELECT * FROM short_links<br>WHERE short_code = ?<br>AND is_active = true
         DB-->>Repository: Link Object
         Repository-->>Service: Link Object
 
-        Service->>Controller: TTL: 24h
+        Service->>Redis: SET link:{short_code}<br>original_url<br>TTL: 24h
         Redis-->>Service: OK
 
-        Service->>Controller: Async Log Click
+        Service->>Service: 异步记录点击<br>Async Log Click
         Service-->>Controller: original_url
     end
 
     Service-->>Controller: original_url
-    Controller-->>Controller: Location: {original_url}
+    Controller-->>Client: 302 Redirect<br>Location: {original_url}
 
     par 异步记录点击日志 Async Click Logging
-        Service->>Controller: Extract Click Data
-        Service->>Controller: Hash IP (SHA256)
-        Service->>Controller: Parse UA
-        Service->>Controller: GeoIP Lookup
+        Service->>Service: 提取访问信息<br>Extract Click Data
+        Service->>Service: IP 哈希<br>Hash IP (SHA256)
+        Service->>Service: 解析 User-Agent<br>Parse UA
+        Service->>Service: GeoIP 定位<br>GeoIP Lookup
         Service->>Repository: createClickLog(click_data)
-        Repository->>Controller: (country, city, device_type...)
+        Repository->>DB: INSERT INTO click_logs<br>(link_id, clicked_at, ip_hash,<br>country, city, device_type...)
         DB-->>Repository: OK
         Service->>Repository: incrementClickCount(link_id)
-        Repository->>Controller: WHERE id = ?
+        Repository->>DB: UPDATE short_links<br>SET click_count = click_count + 1<br>WHERE id = ?
         DB-->>Repository: OK
     end
 
-    Note over Client,DB: Get User Links
+    Note over Client,DB: 获取用户链接列表 Get User Links
 
     Client->>Controller: GET /api/links?page=1&limit=10
-    Controller->>Controller: Verify JWT
+    Controller->>Controller: 验证 JWT<br>Verify JWT
 
     Controller->>Service: getUserLinks(user_id, pagination)
 
     Service->>Redis: GET links:user:{user_id}:page:1
-    alt Cache Hit
+    alt 缓存命中 Cache Hit
         Redis-->>Service: Cached Links
         Service-->>Controller: Links Array
-    else Cache Miss
+    else 缓存未命中 Cache Miss
         Service->>Repository: findByUserId(user_id, pagination)
-        Repository->>Controller: ORDER BY created_at DESC<br>LIMIT 10 OFFSET 0
+        Repository->>DB: SELECT * FROM short_links<br>WHERE user_id = ?<br>ORDER BY created_at DESC<br>LIMIT 10 OFFSET 0
         DB-->>Repository: Links Array
         Repository-->>Service: Links Array
 
-        Service->>Controller: TTL: 5min
+        Service->>Redis: SET links:user:{user_id}:page:1<br>links_array<br>TTL: 5min
         Redis-->>Service: OK
 
         Service-->>Controller: Links Array
     end
 
-    Controller-->>Controller: {links: [...], total: 123}
+    Controller-->>Client: 200 OK<br>{links: [...], total: 123}
 
-    Note over Client,DB: Update Link
+    Note over Client,DB: 更新短链接 Update Link
 
-    Client->>Controller: {original_url, is_active}
-    Controller->>Controller: Verify JWT
-    Controller->>Controller: Verify Ownership
+    Client->>Controller: PATCH /api/links/:link_id<br>{original_url, is_active}
+    Controller->>Controller: 验证 JWT<br>Verify JWT
+    Controller->>Controller: 验证权限<br>Verify Ownership
 
     Controller->>Service: updateLink(link_id, user_id, data)
 
     Service->>Repository: findById(link_id)
-    Repository->>Controller: WHERE id = ? AND user_id = ?
+    Repository->>DB: SELECT * FROM short_links<br>WHERE id = ? AND user_id = ?
     DB-->>Repository: Link Object
     Repository-->>Service: Link Object
 
-    alt Not Found or Unauthorized
+    alt 链接不存在或无权限 Not Found or Unauthorized
         Service-->>Controller: Error: Not Found
         Controller-->>Client: 404 Not Found
-    else Update Success
+    else 更新成功 Update Success
         Service->>Repository: update(link_id, data)
-        Repository->>Controller: WHERE id = ?
+        Repository->>DB: UPDATE short_links<br>SET original_url = ?, is_active = ?<br>WHERE id = ?
         DB-->>Repository: Updated Link
         Repository-->>Service: Link Object
 
-        Service->>Controller: TTL: 24h
+        Service->>Redis: SET link:{short_code}<br>new_original_url<br>TTL: 24h
         Service->>Redis: DEL links:user:{user_id}:*
         Redis-->>Service: OK
 
         Service-->>Controller: Updated Link
-        Controller-->>Controller: {link: {...}}
+        Controller-->>Client: 200 OK<br>{link: {...}}
     end
 
-    Note over Client,DB: Delete Link
+    Note over Client,DB: 删除短链接 Delete Link
 
     Client->>Controller: DELETE /api/links/:link_id
-    Controller->>Controller: Verify JWT
-    Controller->>Controller: Verify Ownership
+    Controller->>Controller: 验证 JWT<br>Verify JWT
+    Controller->>Controller: 验证权限<br>Verify Ownership
 
     Controller->>Service: deleteLink(link_id, user_id)
 
     Service->>Repository: findById(link_id)
-    Repository->>Controller: WHERE id = ? AND user_id = ?
+    Repository->>DB: SELECT * FROM short_links<br>WHERE id = ? AND user_id = ?
     DB-->>Repository: Link Object
     Repository-->>Service: Link Object
 
-    alt Soft Delete
+    alt 软删除 Soft Delete
         Service->>Repository: update(link_id, {is_active: false})
-        Repository->>Controller: WHERE id = ?
+        Repository->>DB: UPDATE short_links<br>SET is_active = false<br>WHERE id = ?
         DB-->>Repository: OK
     else 硬删除 Hard Delete (可选)
         Service->>Repository: delete(link_id)
-        Repository->>Controller: WHERE id = ?
+        Repository->>DB: DELETE FROM short_links<br>WHERE id = ?
         DB-->>Repository: OK
     end
 
@@ -336,7 +336,7 @@ async function redirect(shortCode: string, request: any) {
     // 2. Redis 未命中,查询数据库
     const link = await linkRepository.findByShortCode(shortCode)
 
-    if (!link ||!link.is_active) {
+    if (!link || !link.is_active) {
       throw new Error('链接不存在或已失效')
     }
 
@@ -367,7 +367,7 @@ async function logClickAsync(shortCode: string, request: any) {
   // 提取访问信息
   const ip = request.headers['x-real-ip'] || request.ip
   const userAgent = request.headers['user-agent']
-  const referrer = request.headers['referer'] ||null
+  const referrer = request.headers['referer'] || null
 
   // IP 隐私保护
   const dailySalt = getDailySalt()
@@ -380,12 +380,12 @@ async function logClickAsync(shortCode: string, request: any) {
   const ua = UAParser(userAgent)
   const deviceType = ua.device.type || 'desktop'
   const browser = ua.browser.name || 'Unknown'
-  const os = ua.os.name ||'Unknown'
+  const os = ua.os.name || 'Unknown'
 
   // GeoIP 地理定位
   const geo = geoip.lookup(ip)
   const country = geo?.country || 'Unknown'
-  const city = geo?.city ||'Unknown'
+  const city = geo?.city || 'Unknown'
 
   // 保存点击日志
   await linkRepository.createClickLog({
@@ -408,11 +408,13 @@ async function logClickAsync(shortCode: string, request: any) {
 
 #### 性能指标
 
-| 场景 |响应时间 | 说明 |
+| 场景 | 响应时间 | 说明 |
 |------|----------|------|
 | **Redis 缓存命中** | < 10ms | 95% 的请求 |
 | **Redis 缓存未命中** | < 100ms | 5% 的请求 (首次访问) |
-| **并发处理能力** | 5,000 req/s | 单实例 |---
+| **并发处理能力** | 5,000 req/s | 单实例 |
+
+---
 
 ### 3️⃣ 获取用户链接列表
 
@@ -423,7 +425,7 @@ async function getUserLinks(
     page: number
     limit: number
     sortBy?: 'created_at' | 'click_count'
-    order?: 'ASC' |'DESC'
+    order?: 'ASC' | 'DESC'
   }
 ) {
   const { page = 1, limit = 10, sortBy = 'created_at', order = 'DESC' } = options
@@ -480,7 +482,7 @@ async function updateLink(
   // 1. 验证权限
   const link = await linkRepository.findById(linkId)
 
-  if (!link ||link.user_id !== userId) {
+  if (!link || link.user_id !== userId) {
     throw new Error('链接不存在或无权限')
   }
 
@@ -525,7 +527,7 @@ async function deleteLink(linkId: number, userId: number) {
   // 1. 验证权限
   const link = await linkRepository.findById(linkId)
 
-  if (!link ||link.user_id !== userId) {
+  if (!link || link.user_id !== userId) {
     throw new Error('链接不存在或无权限')
   }
 
@@ -553,21 +555,23 @@ async function deleteLink(linkId: number, userId: number) {
 
 ### 🔒 安全措施
 
-| 措施 |实现方式 |
+| 措施 | 实现方式 |
 |------|----------|
-| **权限验证** |验证 JWT + 检查 user_id 所有权 |
-|**URL 验证** | 正则表达式 + 协议白名单 (http/https) |
-| **防滥用** |用户每天最多创建 100 个短链接 |
-|**短码格式** | 4-12 字符,仅字母数字,防止恶意短码 |
-| **软删除** |保留历史数据,支持恢复 |
-|**IP 哈希** | SHA256 + 每日轮换 Salt |---
+| **权限验证** | 验证 JWT + 检查 user_id 所有权 |
+| **URL 验证** | 正则表达式 + 协议白名单 (http/https) |
+| **防滥用** | 用户每天最多创建 100 个短链接 |
+| **短码格式** | 4-12 字符,仅字母数字,防止恶意短码 |
+| **软删除** | 保留历史数据,支持恢复 |
+| **IP 哈希** | SHA256 + 每日轮换 Salt |
+
+---
 
 ### ⚡ 性能优化
 
-| 策略 |效果 |
+| 策略 | 效果 |
 |------|------|
-| **Bloom Filter** |减少 95% 的数据库查询 |
-|**Redis 缓存** | 重定向响应时间 < 10ms |
-| **异步日志** |不阻塞重定向,保持高吞吐 |
-|**数据库索引** | `short_code` 唯一索引 + `user_id` 索引 |
-| **冗余字段** |`click_count` 字段避免频繁聚合查询 |
+| **Bloom Filter** | 减少 95% 的数据库查询 |
+| **Redis 缓存** | 重定向响应时间 < 10ms |
+| **异步日志** | 不阻塞重定向,保持高吞吐 |
+| **数据库索引** | `short_code` 唯一索引 + `user_id` 索引 |
+| **冗余字段** | `click_count` 字段避免频繁聚合查询 |

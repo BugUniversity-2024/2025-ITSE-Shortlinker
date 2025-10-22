@@ -3,22 +3,22 @@
 
 ```mermaid
 graph TB
-    User([User])
-    Visitor([Visitor])
+    User([用户<br>User])
+    Visitor([访客<br>Visitor])
 
-    subgraph "Short Link Management System"
-        CreateLink[Create Short Link]
-        CustomCode[Customize Short Code]
-        ViewLinks[View Link List]
-        EditLink[Edit Link]
-        DeleteLink[Delete Link]
-        RedirectLink[Access Short Link]
-        ToggleStatus[Toggle Link Status]
+    subgraph "短链接管理系统<br>Short Link Management System"
+        CreateLink[创建短链接<br>Create Short Link]
+        CustomCode[自定义短码<br>Customize Short Code]
+        ViewLinks[查看链接列表<br>View Link List]
+        EditLink[编辑链接<br>Edit Link]
+        DeleteLink[删除链接<br>Delete Link]
+        RedirectLink[访问短链接<br>Access Short Link]
+        ToggleStatus[启用/禁用链接<br>Toggle Link Status]
     end
 
-    Database[Database)]
-    Redis[缓存)]
-    BloomFilter[Bloom Filter]
+    Database[(数据库<br>Database)]
+    Redis[(Redis<br>缓存)]
+    BloomFilter[布隆过滤器<br>Bloom Filter]
 
     User -->|创建| CreateLink
     User -->|查看| ViewLinks
@@ -47,7 +47,7 @@ graph TB
 
     RedirectLink -->|查询映射| Redis
     RedirectLink -.->|缓存未命中| Database
-    RedirectLink -->|302重定向|RedirectLink
+    RedirectLink -->|302重定向| RedirectLink
 
     style User fill:#10B981,color:#fff
     style Visitor fill:#F59E0B,color:#fff
@@ -297,10 +297,10 @@ Redis 查询 (1ms)
 
 ### 安全措施
 
-| 措施 |说明 |
+| 措施 | 说明 |
 |------|------|
-| **权限验证** |仅允许链接所有者编辑/删除 |
-|**URL 验证** | 仅允许 http/https 协议,防止 javascript: 等恶意协议 |
-| **速率限制** |每用户每天最多创建 100 个链接 |
-|**短码格式** | 4-12 字符,仅字母数字,防止恶意短码 (如 admin, api) |
-| **软删除** |保留历史数据,支持审计和恢复 |
+| **权限验证** | 仅允许链接所有者编辑/删除 |
+| **URL 验证** | 仅允许 http/https 协议,防止 javascript: 等恶意协议 |
+| **速率限制** | 每用户每天最多创建 100 个链接 |
+| **短码格式** | 4-12 字符,仅字母数字,防止恶意短码 (如 admin, api) |
+| **软删除** | 保留历史数据,支持审计和恢复 |

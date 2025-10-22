@@ -3,28 +3,28 @@
 
 ```mermaid
 sequenceDiagram
-    participant Client as Client
-    participant Controller as TeamController
-    participant Service as TeamService
-    participant Repository as TeamRepository
-    participant Redis as Cache
-    participant DB as Database
+    participant Client as 客户端<br>Client
+    participant Controller as 控制器<br>TeamController
+    participant Service as 服务层<br>TeamService
+    participant Repository as 仓储层<br>TeamRepository
+    participant Redis as Redis<br>缓存
+    participant DB as PostgreSQL<br>数据库
 
-    Note over Client,DB: Create Team Flow
+    Note over Client,DB: 创建团队流程 Create Team Flow
 
-    Client->>Controller: {team_name}
-    Controller->>Controller: Verify JWT
-    Controller->>Controller: Validate Team Name
+    Client->>Controller: POST /api/teams<br>{team_name}
+    Controller->>Controller: 验证 JWT<br>Verify JWT
+    Controller->>Controller: 验证团队名称<br>Validate Team Name
 
     Controller->>Service: createTeam(user_id, team_name)
 
     Service->>Repository: create({team_name, owner_id: user_id})
-    Repository->>Controller: (team_name, owner_id, created_at)
+    Repository->>DB: INSERT INTO teams<br>(team_name, owner_id, created_at)
     DB-->>Repository: Team ID: 54321
     Repository-->>Service: Team Object
 
     Service->>Repository: addMember(team_id, user_id, role: 'owner')
-    Repository->>Controller: (team_id, user_id, role, joined_at)
+    Repository->>DB: INSERT INTO team_members<br>(team_id, user_id, role, joined_at)
     DB-->>Repository: OK
     Repository-->>Service: OK
 
@@ -32,78 +32,78 @@ sequenceDiagram
     Redis-->>Service: OK
 
     Service-->>Controller: Team Object
-    Controller-->>Controller: {team: {id, team_name, role: 'owner'}}
+    Controller-->>Client: 201 Created<br>{team: {id, team_name, role: 'owner'}}
 
-    Note over Client,DB: Invite Member Flow
+    Note over Client,DB: 邀请成员流程 Invite Member Flow
 
-    Client->>Controller: {email, role}
-    Controller->>Controller: Verify JWT
-    Controller->>Controller: Verify Admin Permission
+    Client->>Controller: POST /api/teams/:team_id/invite<br>{email, role}
+    Controller->>Controller: 验证 JWT<br>Verify JWT
+    Controller->>Controller: 验证权限<br>Verify Admin Permission
 
     Controller->>Service: inviteMember(team_id, inviter_id, email, role)
 
     Service->>Repository: findTeamById(team_id)
-    Repository->>Controller: WHERE id = ?
+    Repository->>DB: SELECT * FROM teams<br>WHERE id = ?
     DB-->>Repository: Team Object
     Repository-->>Service: Team Object
 
     Service->>Repository: getMemberRole(team_id, inviter_id)
-    Repository->>Controller: WHERE team_id = ? AND user_id = ?
+    Repository->>DB: SELECT role FROM team_members<br>WHERE team_id = ? AND user_id = ?
     DB-->>Repository: {role: 'owner'} or {role: 'admin'}
     Repository-->>Service: {role}
 
-    alt Not Admin
+    alt 非管理员 Not Admin
         Service-->>Controller: Error: Forbidden
-        Controller-->>Controller: 需要管理员权限
-    else Is Admin
+        Controller-->>Client: 403 Forbidden<br>需要管理员权限
+    else 是管理员 Is Admin
         Service->>Repository: findUserByEmail(email)
-        Repository->>Controller: WHERE email = ?
+        Repository->>DB: SELECT id FROM users<br>WHERE email = ?
         DB-->>Repository: User Object
         Repository-->>Service: User Object
 
-        alt User Not Found
+        alt 用户不存在 User Not Found
             Service-->>Controller: Error: User Not Found
-            Controller-->>Controller: 该用户不存在
-        else User Already Member
+            Controller-->>Client: 404 Not Found<br>该用户不存在
+        else 用户已是成员 User Already Member
             Service->>Repository: checkMembership(team_id, user_id)
-            Repository->>Controller: WHERE team_id = ? AND user_id = ?
+            Repository->>DB: SELECT * FROM team_members<br>WHERE team_id = ? AND user_id = ?
             DB-->>Repository: Existing Record
             Repository-->>Service: true
             Service-->>Controller: Error: Already Member
-            Controller-->>Controller: 用户已是团队成员
-        else Send Invitation
-            Service->>Controller: Generate Invite Code
-            Service->>Controller: TTL: 7d
+            Controller-->>Client: 409 Conflict<br>用户已是团队成员
+        else 发送邀请 Send Invitation
+            Service->>Service: 生成邀请码<br>Generate Invite Code
+            Service->>Redis: SET invite:{code}<br>{team_id, email, role}<br>TTL: 7d
             Redis-->>Service: OK
 
-            Service->>Controller: Send Invite Email
+            Service->>Service: 发送邀请邮件<br>Send Invite Email
             Service-->>Controller: {invite_code}
-            Controller-->>Controller: {message: '邀请已发送', invite_code}
+            Controller-->>Client: 200 OK<br>{message: '邀请已发送', invite_code}
         end
     end
 
-    Note over Client,DB: Accept Invitation Flow
+    Note over Client,DB: 接受邀请流程 Accept Invitation Flow
 
-    Client->>Controller: {invite_code}
-    Controller->>Controller: Verify JWT
+    Client->>Controller: POST /api/teams/accept-invite<br>{invite_code}
+    Controller->>Controller: 验证 JWT<br>Verify JWT
 
     Controller->>Service: acceptInvitation(user_id, invite_code)
 
     Service->>Redis: GET invite:{invite_code}
-    alt Invalid Code
+    alt 邀请码无效 Invalid Code
         Redis-->>Service: null
         Service-->>Controller: Error: Invalid Invite
-        Controller-->>Controller: 邀请码无效或已过期
-    else Valid Code
+        Controller-->>Client: 404 Not Found<br>邀请码无效或已过期
+    else 邀请码有效 Valid Code
         Redis-->>Service: {team_id, email, role}
-        Service->>Controller: Verify Email Match
+        Service->>Service: 验证邮箱匹配<br>Verify Email Match
 
-        alt Email Mismatch
+        alt 邮箱不匹配 Email Mismatch
             Service-->>Controller: Error: Email Mismatch
-            Controller-->>Controller: 邀请不是发给你的
-        else Email Match
+            Controller-->>Client: 403 Forbidden<br>邀请不是发给你的
+        else 邮箱匹配 Email Match
             Service->>Repository: addMember(team_id, user_id, role)
-            Repository->>Controller: (team_id, user_id, role, joined_at)
+            Repository->>DB: INSERT INTO team_members<br>(team_id, user_id, role, joined_at)
             DB-->>Repository: OK
             Repository-->>Service: OK
 
@@ -112,64 +112,64 @@ sequenceDiagram
             Redis-->>Service: OK
 
             Service-->>Controller: Team Object
-            Controller-->>Controller: {team: {...}, role}
+            Controller-->>Client: 200 OK<br>{team: {...}, role}
         end
     end
 
-    Note over Client,DB: Get Team Members
+    Note over Client,DB: 获取团队成员列表 Get Team Members
 
     Client->>Controller: GET /api/teams/:team_id/members
-    Controller->>Controller: Verify JWT
-    Controller->>Controller: Verify Membership
+    Controller->>Controller: 验证 JWT<br>Verify JWT
+    Controller->>Controller: 验证成员资格<br>Verify Membership
 
     Controller->>Service: getMembers(team_id, user_id)
 
     Service->>Repository: checkMembership(team_id, user_id)
-    Repository->>Controller: WHERE team_id = ? AND user_id = ?
+    Repository->>DB: SELECT * FROM team_members<br>WHERE team_id = ? AND user_id = ?
     DB-->>Repository: Member Record
     Repository-->>Service: true
 
-    alt Not a Member
+    alt 非成员 Not a Member
         Service-->>Controller: Error: Forbidden
         Controller-->>Client: 403 Forbidden
-    else Is Member
+    else 是成员 Is Member
         Service->>Redis: GET team:{team_id}:members
-        alt Cache Hit
+        alt 缓存命中 Cache Hit
             Redis-->>Service: Cached Members
             Service-->>Controller: Members List
-        else Cache Miss
+        else 缓存未命中 Cache Miss
             Service->>Repository: getMembers(team_id)
-            Repository->>Controller:   tm.role, tm.joined_at<br>FROM team_members tm<br>JOIN users u ON tm.user_id = u.id<br>WHERE tm.team_id = ?<br>ORDER BY tm.joined_at
+            Repository->>DB: SELECT<br>  u.id, u.username, u.email,<br>  tm.role, tm.joined_at<br>FROM team_members tm<br>JOIN users u ON tm.user_id = u.id<br>WHERE tm.team_id = ?<br>ORDER BY tm.joined_at
             DB-->>Repository: Members Array
             Repository-->>Service: Members List
 
-            Service->>Controller: TTL: 10min
+            Service->>Redis: SET team:{team_id}:members<br>members_list<br>TTL: 10min
             Redis-->>Service: OK
 
             Service-->>Controller: Members List
         end
-        Controller-->>Controller: {members: [...]}
+        Controller-->>Client: 200 OK<br>{members: [...]}
     end
 
-    Note over Client,DB: Update Member Role
+    Note over Client,DB: 更新成员角色 Update Member Role
 
-    Client->>Controller: {role: 'admin'}
-    Controller->>Controller: Verify JWT
-    Controller->>Controller: Verify Owner Permission
+    Client->>Controller: PATCH /api/teams/:team_id/members/:user_id<br>{role: 'admin'}
+    Controller->>Controller: 验证 JWT<br>Verify JWT
+    Controller->>Controller: 验证 Owner 权限<br>Verify Owner Permission
 
     Controller->>Service: updateMemberRole(team_id, operator_id, target_user_id, new_role)
 
     Service->>Repository: getMemberRole(team_id, operator_id)
-    Repository->>Controller: WHERE team_id = ? AND user_id = ?
+    Repository->>DB: SELECT role FROM team_members<br>WHERE team_id = ? AND user_id = ?
     DB-->>Repository: {role: 'owner'}
     Repository-->>Service: {role: 'owner'}
 
-    alt Owner Not Owner
+    alt 非 Owner Not Owner
         Service-->>Controller: Error: Forbidden
-        Controller-->>Controller: 仅 Owner 可修改角色
-    else Owner Is Owner
+        Controller-->>Client: 403 Forbidden<br>仅 Owner 可修改角色
+    else 是 Owner Is Owner
         Service->>Repository: updateRole(team_id, target_user_id, new_role)
-        Repository->>Controller: WHERE team_id = ? AND user_id = ?
+        Repository->>DB: UPDATE team_members<br>SET role = ?<br>WHERE team_id = ? AND user_id = ?
         DB-->>Repository: OK
         Repository-->>Service: Updated Member
 
@@ -177,34 +177,34 @@ sequenceDiagram
         Redis-->>Service: OK
 
         Service-->>Controller: Updated Member
-        Controller-->>Controller: {member: {...}}
+        Controller-->>Client: 200 OK<br>{member: {...}}
     end
 
-    Note over Client,DB: Remove Member
+    Note over Client,DB: 移除成员 Remove Member
 
     Client->>Controller: DELETE /api/teams/:team_id/members/:user_id
-    Controller->>Controller: Verify JWT
-    Controller->>Controller: Verify Permission
+    Controller->>Controller: 验证 JWT<br>Verify JWT
+    Controller->>Controller: 验证权限<br>Verify Permission
 
     Controller->>Service: removeMember(team_id, operator_id, target_user_id)
 
     Service->>Repository: getMemberRole(team_id, operator_id)
-    Repository->>Controller: WHERE team_id = ? AND user_id = ?
+    Repository->>DB: SELECT role FROM team_members<br>WHERE team_id = ? AND user_id = ?
     DB-->>Repository: {role}
     Repository-->>Service: {role}
 
-    alt Self Leave
+    alt 自己退出 Self Leave
         Service->>Repository: getMemberRole(team_id, target_user_id)
-        Repository->>Controller: WHERE team_id = ? AND user_id = ?
+        Repository->>DB: SELECT role FROM team_members<br>WHERE team_id = ? AND user_id = ?
         DB-->>Repository: {role}
         Repository-->>Service: {role}
 
         alt Owner 不能自己退出 Owner Cannot Leave
             Service-->>Controller: Error: Owner Cannot Leave
-            Controller-->>Controller: 请先转让 Owner 权限
-        else Member Leave
+            Controller-->>Client: 403 Forbidden<br>请先转让 Owner 权限
+        else 成员退出 Member Leave
             Service->>Repository: removeMember(team_id, target_user_id)
-            Repository->>Controller: WHERE team_id = ? AND user_id = ?
+            Repository->>DB: DELETE FROM team_members<br>WHERE team_id = ? AND user_id = ?
             DB-->>Repository: OK
             Repository-->>Service: OK
 
@@ -215,13 +215,13 @@ sequenceDiagram
             Service-->>Controller: Success
             Controller-->>Client: 204 No Content
         end
-    else Admin Remove Member
-        alt Not Admin
+    else 管理员移除成员 Admin Remove Member
+        alt 非管理员 Not Admin
             Service-->>Controller: Error: Forbidden
             Controller-->>Client: 403 Forbidden
-        else Admin Remove
+        else 管理员移除 Admin Remove
             Service->>Repository: removeMember(team_id, target_user_id)
-            Repository->>Controller: WHERE team_id = ? AND user_id = ?
+            Repository->>DB: DELETE FROM team_members<br>WHERE team_id = ? AND user_id = ?
             DB-->>Repository: OK
             Repository-->>Service: OK
 
@@ -234,56 +234,56 @@ sequenceDiagram
         end
     end
 
-    Note over Client,DB: Get User Teams
+    Note over Client,DB: 获取用户团队列表 Get User Teams
 
     Client->>Controller: GET /api/teams
-    Controller->>Controller: Verify JWT
+    Controller->>Controller: 验证 JWT<br>Verify JWT
 
     Controller->>Service: getUserTeams(user_id)
 
     Service->>Redis: GET teams:user:{user_id}
-    alt Cache Hit
+    alt 缓存命中 Cache Hit
         Redis-->>Service: Cached Teams
         Service-->>Controller: Teams List
-    else Cache Miss
+    else 缓存未命中 Cache Miss
         Service->>Repository: getUserTeams(user_id)
-        Repository->>Controller:   tm.role, tm.joined_at<br>FROM team_members tm<br>JOIN teams t ON tm.team_id = t.id<br>WHERE tm.user_id = ?<br>ORDER BY tm.joined_at DESC
+        Repository->>DB: SELECT<br>  t.id, t.team_name, t.created_at,<br>  tm.role, tm.joined_at<br>FROM team_members tm<br>JOIN teams t ON tm.team_id = t.id<br>WHERE tm.user_id = ?<br>ORDER BY tm.joined_at DESC
         DB-->>Repository: Teams Array
         Repository-->>Service: Teams List
 
-        Service->>Controller: TTL: 10min
+        Service->>Redis: SET teams:user:{user_id}<br>teams_list<br>TTL: 10min
         Redis-->>Service: OK
 
         Service-->>Controller: Teams List
     end
-    Controller-->>Controller: {teams: [...]}
+    Controller-->>Client: 200 OK<br>{teams: [...]}
 
-    Note over Client,DB: Delete Team
+    Note over Client,DB: 删除团队 Delete Team
 
     Client->>Controller: DELETE /api/teams/:team_id
-    Controller->>Controller: Verify JWT
-    Controller->>Controller: Verify Owner Permission
+    Controller->>Controller: 验证 JWT<br>Verify JWT
+    Controller->>Controller: 验证 Owner 权限<br>Verify Owner Permission
 
     Controller->>Service: deleteTeam(team_id, user_id)
 
     Service->>Repository: getMemberRole(team_id, user_id)
-    Repository->>Controller: WHERE team_id = ? AND user_id = ?
+    Repository->>DB: SELECT role FROM team_members<br>WHERE team_id = ? AND user_id = ?
     DB-->>Repository: {role: 'owner'}
     Repository-->>Service: {role: 'owner'}
 
-    alt Owner Not Owner
+    alt 非 Owner Not Owner
         Service-->>Controller: Error: Forbidden
-        Controller-->>Controller: 仅 Owner 可删除团队
-    else Owner Is Owner
+        Controller-->>Client: 403 Forbidden<br>仅 Owner 可删除团队
+    else 是 Owner Is Owner
         Service->>Repository: deleteTeam(team_id)
 
-        Repository->>Controller: WHERE team_id = ?
+        Repository->>DB: DELETE FROM team_members<br>WHERE team_id = ?
         DB-->>Repository: OK
 
-        Repository->>Controller: WHERE team_id = ?
+        Repository->>DB: UPDATE short_links<br>SET team_id = NULL<br>WHERE team_id = ?
         DB-->>Repository: OK
 
-        Repository->>Controller: WHERE id = ?
+        Repository->>DB: DELETE FROM teams<br>WHERE id = ?
         DB-->>Repository: OK
 
         Repository-->>Service: Success
@@ -354,7 +354,7 @@ function hasPermission(
   userRole: TeamRole,
   action: keyof typeof PERMISSIONS[TeamRole.OWNER]
 ): boolean {
-  return PERMISSIONS[userRole]?.[action] ||false
+  return PERMISSIONS[userRole]?.[action] || false
 }
 
 // 使用示例
@@ -670,24 +670,24 @@ async function deleteTeam(teamId: number, userId: number) {
 
 ### 🔒 安全措施
 
-| 措施 |实现方式 |
+| 措施 | 实现方式 |
 |------|----------|
-| **角色权限** |三级权限系统 (owner/admin/member) |
-|**邀请验证** | 邮箱验证 + 一次性邀请码 |
-| **权限检查** |每个操作都验证用户权限 |
-|**防护措施** | Owner 不能自己退出,不能被移除 |
-| **事务保证** |删除团队使用数据库事务 |
+| **角色权限** | 三级权限系统 (owner/admin/member) |
+| **邀请验证** | 邮箱验证 + 一次性邀请码 |
+| **权限检查** | 每个操作都验证用户权限 |
+| **防护措施** | Owner 不能自己退出,不能被移除 |
+| **事务保证** | 删除团队使用数据库事务 |
 
 ---
 
 ### ⚡ 性能优化
 
-|策略 | 效果 |
+| 策略 | 效果 |
 |------|------|
-| **Redis 缓存** |成员列表缓存 10 分钟 |
-|**批量查询** | JOIN 查询减少 N+1 问题 |
-| **邀请码存储** |Redis 存储,7 天自动过期 |
-|**缓存清除** | 修改时清除相关缓存 |
+| **Redis 缓存** | 成员列表缓存 10 分钟 |
+| **批量查询** | JOIN 查询减少 N+1 问题 |
+| **邀请码存储** | Redis 存储,7 天自动过期 |
+| **缓存清除** | 修改时清除相关缓存 |
 
 ---
 
@@ -726,7 +726,8 @@ async function sendInviteEmail(
     <h2>🎉 你被邀请加入团队!</h2>
     <p><strong>${data.inviter_name}</strong> 邀请你加入团队 <strong>${data.team_name}</strong>。</p>
     <p>点击下方按钮接受邀请:</p>
-    <a href="${data.invite_link}" class="button"${data.invite_link}</p>
+    <a href="${data.invite_link}" class="button">接受邀请</a>
+    <p>或复制链接到浏览器: <br>${data.invite_link}</p>
     <p style="color: #888; font-size: 14px;">该邀请将在 ${data.expires_in} 后过期。</p>
   </div>
 </body>

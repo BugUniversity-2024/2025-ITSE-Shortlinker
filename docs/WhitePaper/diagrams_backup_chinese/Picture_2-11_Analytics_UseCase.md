@@ -3,23 +3,23 @@
 
 ```mermaid
 graph TB
-    User([User])
-    Visitor([Visitor])
+    User([用户<br>User])
+    Visitor([访客<br>Visitor])
 
-    subgraph "Analytics System"
-        ViewDashboard[View Dashboard]
-        ViewTimeTrends[View Time Trends]
-        ViewGeoDistribution[View Geographic Distribution]
-        ViewDeviceStats[View Device Stats]
-        ViewReferrerAnalysis[View Referrer Analysis]
-        ExportData[Export Data]
-        SelectDateRange[Select Date Range]
+    subgraph "数据分析系统<br>Analytics System"
+        ViewDashboard[查看分析面板<br>View Dashboard]
+        ViewTimeTrends[查看时间趋势<br>View Time Trends]
+        ViewGeoDistribution[查看地理分布<br>View Geographic Distribution]
+        ViewDeviceStats[查看设备统计<br>View Device Stats]
+        ViewReferrerAnalysis[查看来源分析<br>View Referrer Analysis]
+        ExportData[导出数据<br>Export Data]
+        SelectDateRange[选择日期范围<br>Select Date Range]
     end
 
-    ClickLogger[Click Logger]
-    GeoIP[GeoIP Service]
-    Database[Database)]
-    Redis[缓存)]
+    ClickLogger[点击日志记录器<br>Click Logger]
+    GeoIP[GeoIP服务<br>GeoIP Service]
+    Database[(数据库<br>Database)]
+    Redis[(Redis<br>缓存)]
 
     User -->|查看面板| ViewDashboard
     User -->|查看趋势| ViewTimeTrends

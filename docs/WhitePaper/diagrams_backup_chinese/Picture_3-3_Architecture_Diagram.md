@@ -4,52 +4,52 @@
 ```mermaid
 graph TB
     subgraph "客户端层 Client Layer"
-        Browser[Vue3 + Vite + TailwindCSS]
-        Mobile[Responsive Design]
+        Browser[Web 浏览器<br>Web Browser<br>Vue3 + Vite + TailwindCSS]
+        Mobile[移动浏览器<br>Mobile Browser<br>Responsive Design]
     end
 
     subgraph "负载均衡层 Load Balancer"
-        LB[SSL Termination]
+        LB[Nginx / Caddy<br>负载均衡器<br>Load Balancer<br>SSL Termination]
     end
 
     subgraph "应用服务层 Application Layer"
-        App1[Node.js + TypeScript]
-        App2[Node.js + TypeScript]
-        App3[无状态 Stateless]
+        App1[后端实例 1<br>Backend Instance 1<br>Node.js + TypeScript]
+        App2[后端实例 2<br>Backend Instance 2<br>Node.js + TypeScript]
+        App3[后端实例 N<br>Backend Instance N<br>无状态 Stateless]
     end
 
     subgraph "业务逻辑层 Business Logic"
-        Controller[HTTP 请求处理]
-        Service[业务逻辑处理]
-        Repository[数据访问抽象]
+        Controller[控制器层<br>Controller Layer<br>HTTP 请求处理]
+        Service[服务层<br>Service Layer<br>业务逻辑处理]
+        Repository[仓储层<br>Repository Layer<br>数据访问抽象]
     end
 
     subgraph "缓存层 Cache Layer"
-        RedisCluster[Redis Cluster]
-        BloomFilter[短码冲突检测]
+        RedisCluster[Redis 集群<br>Redis Cluster]
+        BloomFilter[Bloom Filter<br>短码冲突检测]
         subgraph "Redis 缓存策略"
-            Cache1[TTL: 24h]
-            Cache2[TTL: 1h]
-            Cache3[Sliding Window]
+            Cache1[短链接映射<br>TTL: 24h]
+            Cache2[聚合统计<br>TTL: 1h]
+            Cache3[API 速率限制<br>Sliding Window]
         end
     end
 
     subgraph "数据持久层 Data Persistence"
-        PG_Master[读写)]
-        PG_Replica1[只读)]
-        PG_Replica2[只读)]
+        PG_Master[(PostgreSQL<br>主数据库<br>Master DB<br>读写)]
+        PG_Replica1[(PostgreSQL<br>从库 1<br>Replica 1<br>只读)]
+        PG_Replica2[(PostgreSQL<br>从库 2<br>Replica 2<br>只读)]
     end
 
     subgraph "外部服务 External Services"
-        GeoIP[geoip-lite]
-        Email[SendGrid/SMTP]
-        Storage[图片/文件]
+        GeoIP[GeoIP 服务<br>地理位置解析<br>geoip-lite]
+        Email[邮件服务<br>Email Service<br>SendGrid/SMTP]
+        Storage[对象存储<br>Object Storage<br>图片/文件]
     end
 
     subgraph "监控日志 Monitoring & Logging"
-        Prometheus[指标采集]
-        Grafana[数据可视化]
-        Logs[JSON 格式]
+        Prometheus[Prometheus<br>指标采集]
+        Grafana[Grafana<br>数据可视化]
+        Logs[集中日志<br>Winston/Pino<br>JSON 格式]
     end
 
     %% 客户端 → 负载均衡
@@ -243,12 +243,14 @@ server {
 
 **缓存策略：**
 
-|缓存类型 | Key 格式 | TTL | 说明 |
+| 缓存类型 | Key 格式 | TTL | 说明 |
 |----------|----------|-----|------|
-| **短链接映射** | `link:{short_code}` | 24h |存储 `original_url` |
-|**聚合统计** | `analytics:{link_id}:{range}` | 1h | 预计算的分析数据 |
-| **API 速率限制** | `ratelimit:{api_key_hash}:{hour}` | 1h |滑动窗口计数器 |
-| **Bloom Filter** | `bloom:short_codes` |永久 | 短码存在性检测 |**性能数据：**
+| **短链接映射** | `link:{short_code}` | 24h | 存储 `original_url` |
+| **聚合统计** | `analytics:{link_id}:{range}` | 1h | 预计算的分析数据 |
+| **API 速率限制** | `ratelimit:{api_key_hash}:{hour}` | 1h | 滑动窗口计数器 |
+| **Bloom Filter** | `bloom:short_codes` | 永久 | 短码存在性检测 |
+
+**性能数据：**
 ```
 Redis GET:    < 1ms  （本地网络）
 Redis SET:    < 2ms
@@ -417,12 +419,12 @@ app.use((req, res, next) => {
 
 ### ⚡ 性能目标
 
-| 指标 |目标值 |
+| 指标 | 目标值 |
 |------|--------|
 | **重定向响应时间** | < 100ms (P95) |
-|**API 响应时间** | < 200ms (P95) |
+| **API 响应时间** | < 200ms (P95) |
 | **并发处理能力** | 5,000 req/s |
-|**可用性** | 99.5% |
+| **可用性** | 99.5% |
 | **缓存命中率** | > 95% |
 
 ---

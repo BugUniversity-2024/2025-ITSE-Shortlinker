@@ -3,48 +3,124 @@
 
 ```mermaid
 sequenceDiagram
-    participant Client as Client
-    participant Controller as UserController
-    participant Service as UserService
-    participant Repository as UserRepository
-    participant Redis as Cache
-    participant DB as Database
+    participant Client as 客户端<br>Client
+    participant Controller as 控制器<br>UserController
+    participant Service as 服务层<br>UserService
+    participant Repository as 仓储层<br>UserRepository
+    participant Redis as Redis<br>缓存
+    participant DB as PostgreSQL<br>数据库
 
-    Note over Client,DB: User Registration Flow
+    Note over Client,DB: 用户注册流程 User Registration Flow
 
-    Client->>Controller: {email, username, password}
-    Controller->>Controller: Validate Input (Joi/Zod)
+    Client->>Controller: POST /api/auth/register<br>{email, username, password}
+    Controller->>Controller: 验证输入格式<br>Validate Input (Joi/Zod)
 
     Controller->>Service: register(userData)
     Service->>Repository: findByEmail(email)
-    Repository->>Controller: WHERE email = ?
+    Repository->>DB: SELECT * FROM users<br>WHERE email = ?
     DB-->>Repository: null (用户不存在)
     Repository-->>Service: null
 
-    Service->>Controller: Check Username Unique
+    Service->>Service: 检查用户名唯一性<br>Check Username Unique
     Service->>Repository: findByUsername(username)
-    Repository->>Controller: WHERE username = ?
+    Repository->>DB: SELECT * FROM users<br>WHERE username = ?
     DB-->>Repository: null (用户名可用)
     Repository-->>Service: null
 
-    Service->>Controller: Hash Password (Argon2)
-    Service->>Controller: Generate Verification Code
+    Service->>Service: 哈希密码<br>Hash Password (Argon2)
+    Service->>Service: 生成验证码<br>Generate Verification Code
 
     Service->>Repository: create(userData)
-    Repository->>Controller: (is_verified: false)
+    Repository->>DB: INSERT INTO users<br>(email, username, password_hash,<br>is_verified: false)
     DB-->>Repository: User ID: 12345
     Repository-->>Service: User Object
 
-    Service->>Controller: TTL: 10min
+    Service->>Redis: SET verify:12345<br>verification_code<br>TTL: 10min
     Redis-->>Service: OK
 
-    Service->>Controller: Send Verification Email
+    Service->>Service: 发送验证邮件<br>Send Verification Email
     Service-->>Controller: {success: true, user_id: 12345}
-    Controller-->>Controller: {message: "注册成功,请验证邮箱"{user_id: 12345, code: "ABC123"}
+    Controller-->>Client: 201 Created<br>{message: "注册成功,请验证邮箱"}
+
+    Note over Client,DB: 邮箱验证流程 Email Verification Flow
+
+    Client->>Controller: POST /api/auth/verify<br>{user_id: 12345, code: "ABC123"}
     Controller->>Service: verifyEmail(user_id, code)
 
     Service->>Redis: GET verify:12345
-    Redis-->>Service: "ABC123"{message: "验证成功"{token: "eyJhbGc..."{username: "new_name"{user: {...}}
+    Redis-->>Service: "ABC123"
+
+    Service->>Service: 比对验证码<br>Compare Codes
+
+    Service->>Repository: update(user_id, {is_verified: true})
+    Repository->>DB: UPDATE users<br>SET is_verified = true<br>WHERE id = 12345
+    DB-->>Repository: OK
+    Repository-->>Service: Updated User
+
+    Service->>Redis: DEL verify:12345
+    Redis-->>Service: OK
+
+    Service-->>Controller: {success: true}
+    Controller-->>Client: 200 OK<br>{message: "验证成功"}
+
+    Note over Client,DB: 用户登录流程 User Login Flow
+
+    Client->>Controller: POST /api/auth/login<br>{email, password}
+    Controller->>Controller: 验证输入<br>Validate Input
+
+    Controller->>Service: login(email, password)
+
+    Service->>Redis: GET user:email:{email}
+    Redis-->>Service: Cache Miss
+
+    Service->>Repository: findByEmail(email)
+    Repository->>DB: SELECT * FROM users<br>WHERE email = ?
+    DB-->>Repository: User Object
+    Repository-->>Service: User Object
+
+    Service->>Redis: SET user:email:{email}<br>user_object<br>TTL: 1h
+    Redis-->>Service: OK
+
+    Service->>Service: 验证密码<br>Verify Password (Argon2)
+    Service->>Service: 生成 JWT Token<br>Generate JWT<br>(exp: 7d)
+
+    Service->>Redis: SET session:{user_id}<br>token_hash<br>TTL: 7d
+    Redis-->>Service: OK
+
+    Service-->>Controller: {token, user_profile}
+    Controller-->>Client: 200 OK<br>{token: "eyJhbGc...",<br>user: {...}}
+
+    Note over Client,DB: 获取用户资料 Get User Profile
+
+    Client->>Controller: GET /api/users/profile<br>Authorization: Bearer {token}
+    Controller->>Controller: 验证 JWT Token<br>Verify JWT
+
+    Controller->>Service: getProfile(user_id)
+
+    Service->>Redis: GET user:profile:{user_id}
+    Redis-->>Service: Cached Profile
+
+    Service-->>Controller: User Profile
+    Controller-->>Client: 200 OK<br>{user: {...}}
+
+    Note over Client,DB: 更新用户资料 Update User Profile
+
+    Client->>Controller: PATCH /api/users/profile<br>{username: "new_name"}
+    Controller->>Controller: 验证 JWT<br>Verify JWT
+    Controller->>Controller: 验证输入<br>Validate Input
+
+    Controller->>Service: updateProfile(user_id, data)
+    Service->>Repository: update(user_id, data)
+    Repository->>DB: UPDATE users<br>SET username = ?<br>WHERE id = ?
+    DB-->>Repository: Updated User
+    Repository-->>Service: User Object
+
+    Service->>Redis: DEL user:profile:{user_id}
+    Service->>Redis: DEL user:email:{email}
+    Redis-->>Service: OK
+
+    Service-->>Controller: Updated User
+    Controller-->>Client: 200 OK<br>{user: {...}}
 
     style Client fill:#E3F2FD
     style Controller fill:#C8E6C9
@@ -263,7 +339,7 @@ async function login(email: string, password: string) {
 export async function authenticateJWT(req, res, next) {
   const authHeader = req.headers.authorization
 
-  if (!authHeader ||!authHeader.startsWith('Bearer ')) {
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return res.status(401).json({ error: 'Missing authorization token' })
   }
 
@@ -379,18 +455,20 @@ async function updateProfile(userId: number, updateData: any) {
 
 ### 🔒 安全措施
 
-| 措施 |实现方式 |
+| 措施 | 实现方式 |
 |------|----------|
-| **密码存储** |Argon2id 哈希（内存成本 64MB，迭代 3 次） |
-|**JWT 签名** | HS256 算法 + 环境变量密钥 |
-| **会话管理** |Redis 存储 Token 哈希，支持撤销 |
-|**输入验证** | Zod schema 验证 |
-| **速率限制** |登录失败 5 次锁定 15 分钟 |
-|**邮箱验证** | 10 分钟有效期 + 一次性验证码 |---
+| **密码存储** | Argon2id 哈希（内存成本 64MB，迭代 3 次） |
+| **JWT 签名** | HS256 算法 + 环境变量密钥 |
+| **会话管理** | Redis 存储 Token 哈希，支持撤销 |
+| **输入验证** | Zod schema 验证 |
+| **速率限制** | 登录失败 5 次锁定 15 分钟 |
+| **邮箱验证** | 10 分钟有效期 + 一次性验证码 |
+
+---
 
 ### ⚡ 性能指标
 
-| 操作 |响应时间 | 说明 |
+| 操作 | 响应时间 | 说明 |
 |------|----------|------|
 | **注册** | < 500ms | 包含密码哈希和邮件发送（异步） |
 | **登录** | < 200ms | Redis 缓存命中率 > 80% |

@@ -3,65 +3,65 @@
 
 ```mermaid
 flowchart TD
-    Start([开始 Start]) --> APISettings[Enter API Settings Page]
-    APISettings --> ViewKeys[View Existing API Keys]
-    ViewKeys --> UserAction{User Action}
+    Start([开始 Start]) --> APISettings[进入 API 设置页面<br>Enter API Settings Page]
+    APISettings --> ViewKeys[查看现有 API Keys<br>View Existing API Keys]
+    ViewKeys --> UserAction{用户操作<br>User Action}
 
-    UserAction -->|Create New Key| SelectPerm[Select Permissions]
-    UserAction -->|Revoke Key| RevokeKey[Revoke API Key]
-    UserAction -->|Use API| PrepareCall
+    UserAction -->|创建新 Key<br>Create New Key| SelectPerm[选择权限<br>Select Permissions]
+    UserAction -->|撤销 Key<br>Revoke Key| RevokeKey[撤销 API Key<br>Revoke API Key]
+    UserAction -->|使用 API<br>Use API| PrepareCall
 
-    SelectPerm --> SetReadOnly{Permission Setting}
-    SetReadOnly -->|Read-Only| ReadPerm[write: false]
-    SetReadOnly -->|Read-Write| WritePerm[write: true]
+    SelectPerm --> SetReadOnly{权限设置<br>Permission Setting}
+    SetReadOnly -->|只读 Read-Only| ReadPerm[设置 read: true<br>write: false]
+    SetReadOnly -->|读写 Read-Write| WritePerm[设置 read: true<br>write: true]
 
-    ReadPerm --> SetLimit[默认 1000/小时]
+    ReadPerm --> SetLimit[设置速率限制<br>Set Rate Limit<br>默认 1000/小时]
     WritePerm --> SetLimit
 
-    SetLimit --> GenerateKey[Generate Random Key]
-    GenerateKey --> HashKey[Hash with SHA256]
-    HashKey --> ShowOnce[⚠️ 请立即保存]
-    ShowOnce --> KeyCreated[Key Created]
+    SetLimit --> GenerateKey[生成随机 Key<br>Generate Random Key]
+    GenerateKey --> HashKey[SHA256 哈希存储<br>Hash with SHA256]
+    HashKey --> ShowOnce[仅显示一次<br>Display Only Once<br>⚠️ 请立即保存]
+    ShowOnce --> KeyCreated[Key 创建成功<br>Key Created]
     KeyCreated --> End1([结束 End])
 
-    RevokeKey --> InvalidateRedis[Invalidate in Redis]
-    InvalidateRedis --> DeleteDB[Delete from DB]
-    DeleteDB --> RevokeSuccess[Revoke Success]
+    RevokeKey --> InvalidateRedis[Redis 中失效<br>Invalidate in Redis]
+    InvalidateRedis --> DeleteDB[数据库中删除<br>Delete from DB]
+    DeleteDB --> RevokeSuccess[撤销成功<br>Revoke Success]
     RevokeSuccess --> End1
 
-    PrepareCall([Prepare API Call]) --> UploadFile{Operation Type}
-    UploadFile -->|Import| PrepareCSV[Prepare CSV/JSON File]
-    UploadFile -->|Export| PrepareExport[Prepare Export Request]
+    PrepareCall([API 调用准备<br>Prepare API Call]) --> UploadFile{操作类型<br>Operation Type}
+    UploadFile -->|批量导入<br>Batch Import| PrepareCSV[准备 CSV/JSON 文件<br>Prepare CSV/JSON File]
+    UploadFile -->|批量导出<br>Batch Export| PrepareExport[准备导出请求<br>Prepare Export Request]
 
-    PrepareCSV --> ParseFile[提取 URLs]
-    ParseFile --> BuildRequest[Build API Request]
+    PrepareCSV --> ParseFile[解析文件<br>Parse File<br>提取 URLs]
+    ParseFile --> BuildRequest[构建 API 请求<br>Build API Request]
 
     PrepareExport --> BuildRequest
 
-    BuildRequest --> AddAuth[Bearer API_KEY]
-    AddAuth --> SendRequest[Send HTTP Request]
-    SendRequest --> Gateway[API Gateway Receives]
+    BuildRequest --> AddAuth[添加 Authorization Header<br>Bearer API_KEY]
+    AddAuth --> SendRequest[发送 POST/GET 请求<br>Send HTTP Request]
+    SendRequest --> Gateway[API Gateway 接收<br>API Gateway Receives]
 
-    Gateway --> ValidateKey{Validate API Key}
-    ValidateKey -->|Invalid| Return401[Return 401 Error]
-    ValidateKey -->|Valid| CheckRate{Check Rate Limit}
+    Gateway --> ValidateKey{验证 API Key<br>Validate API Key}
+    ValidateKey -->|无效 Invalid| Return401[返回 401 Unauthorized<br>Return 401 Error]
+    ValidateKey -->|有效 Valid| CheckRate{检查速率限制<br>Check Rate Limit}
 
-    CheckRate -->|Exceeded| Return429[Return 429 Error]
-    CheckRate -->|OK| ProcessBatch[Process Batch Operation]
+    CheckRate -->|超限 Exceeded| Return429[返回 429 Too Many Requests<br>Return 429 Error]
+    CheckRate -->|正常 OK| ProcessBatch[处理批量操作<br>Process Batch Operation]
 
-    ProcessBatch --> ImportFlow{Import/Export}
-    ImportFlow -->|Import| ValidateURLs[Validate Each URL]
-    ImportFlow -->|Export| QueryLinks[Query User Links]
+    ProcessBatch --> ImportFlow{导入/导出<br>Import/Export}
+    ImportFlow -->|导入 Import| ValidateURLs[验证每个 URL<br>Validate Each URL]
+    ImportFlow -->|导出 Export| QueryLinks[查询用户链接<br>Query User Links]
 
-    ValidateURLs --> GenerateCodes[Generate Short Codes]
-    GenerateCodes --> SaveBatch[Batch Save to DB]
+    ValidateURLs --> GenerateCodes[批量生成短码<br>Generate Short Codes]
+    GenerateCodes --> SaveBatch[批量保存到 DB<br>Batch Save to DB]
     SaveBatch --> ReturnResult
 
-    QueryLinks --> FormatData[CSV/JSON]
-    FormatData --> ReturnResult[Return Result]
+    QueryLinks --> FormatData[格式化数据<br>Format Data<br>CSV/JSON]
+    FormatData --> ReturnResult[返回操作结果<br>Return Result]
 
-    ReturnResult --> IncrementCount[Increment API Call Count]
-    IncrementCount --> UpdateRedis[Update Redis Counter]
+    ReturnResult --> IncrementCount[增加 API 调用计数<br>Increment API Call Count]
+    IncrementCount --> UpdateRedis[更新 Redis 计数器<br>Update Redis Counter]
     UpdateRedis --> End2([结束 End])
 
     Return401 --> End2
@@ -203,21 +203,23 @@ X-RateLimit-Reset: 1705320000
 
 #### 3. 错误处理
 
-|HTTP 状态码 | 说明 |解决方案 |
+| HTTP 状态码 | 说明 | 解决方案 |
 |-------------|------|----------|
-| **401 Unauthorized** |API Key 无效或已撤销 | 检查 Key 是否正确、是否已过期 |
-| **429 Too Many Requests** |超过速率限制 | 等待 `Retry-After` 秒后重试 |
-| **400 Bad Request** |请求格式错误 | 检查 JSON 格式、URL 有效性 |
-| **500 Internal Server Error** |服务器错误 | 联系技术支持 |---
+| **401 Unauthorized** | API Key 无效或已撤销 | 检查 Key 是否正确、是否已过期 |
+| **429 Too Many Requests** | 超过速率限制 | 等待 `Retry-After` 秒后重试 |
+| **400 Bad Request** | 请求格式错误 | 检查 JSON 格式、URL 有效性 |
+| **500 Internal Server Error** | 服务器错误 | 联系技术支持 |
+
+---
 
 ### 📊 性能优化
 
-| 优化策略 |说明 |
+| 优化策略 | 说明 |
 |----------|------|
-| **批量插入** |使用 PostgreSQL `INSERT ... VALUES (...)` 批量插入 |
-|**异步处理** | 大批量请求（> 1000 条）使用后台任务处理 |
-| **限流保护** |防止恶意滥用 API |
-|**缓存验证** | API Key 验证结果缓存 5 分钟 |
+| **批量插入** | 使用 PostgreSQL `INSERT ... VALUES (...)` 批量插入 |
+| **异步处理** | 大批量请求（> 1000 条）使用后台任务处理 |
+| **限流保护** | 防止恶意滥用 API |
+| **缓存验证** | API Key 验证结果缓存 5 分钟 |
 
 ---
 

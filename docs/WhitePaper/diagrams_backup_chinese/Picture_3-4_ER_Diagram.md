@@ -11,7 +11,7 @@ erDiagram
     Team ||--o{ ShortLink : manages
 
     ShortLink ||--o{ ClickLog : "records clicks"
-    ShortLink ||--o|LandingPage : "has optional"
+    ShortLink ||--o| LandingPage : "has optional"
 
     User {
         int id PK
@@ -83,7 +83,7 @@ erDiagram
 
 ### 关系类型
 
-| 关系 |基数 | 说明 |
+| 关系 | 基数 | 说明 |
 |------|------|------|
 | **User → ShortLink** | 1:N | 一个用户可以创建多个短链接 |
 | **User → Team** | 1:N | 一个用户可以拥有多个团队（作为 owner） |
@@ -91,7 +91,9 @@ erDiagram
 | **User ↔ Team** | N:M | 一个用户可以加入多个团队，一个团队有多个成员 |
 | **Team → ShortLink** | 1:N | 一个团队可以管理多个短链接 |
 | **ShortLink → ClickLog** | 1:N | 一个短链接有多条点击记录 |
-| **ShortLink → LandingPage** | 1:0..1 | 一个短链接可以有 0 或 1 个落地页 |---
+| **ShortLink → LandingPage** | 1:0..1 | 一个短链接可以有 0 或 1 个落地页 |
+
+---
 
 ### 核心实体详解
 
@@ -254,7 +256,7 @@ const ipHash = crypto
 
 #### 外键约束（ON DELETE 策略）
 
-| 关系 |ON DELETE 行为 | 说明 |
+| 关系 | ON DELETE 行为 | 说明 |
 |------|---------------|------|
 | `ShortLink.user_id` → `User.id` | CASCADE | 删除用户时，删除其所有短链接 |
 | `ShortLink.team_id` → `Team.id` | SET NULL | 删除团队时，短链接归属个人 |

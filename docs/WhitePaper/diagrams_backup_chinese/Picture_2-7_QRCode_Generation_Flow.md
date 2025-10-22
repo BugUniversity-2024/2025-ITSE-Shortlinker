@@ -8,12 +8,12 @@ flowchart TD
     ClickQR --> ReadURL[Frontend Reads Short URL]
     ReadURL --> CustomizeOptions{Customize Options}
 
-    CustomizeOptions -->|Use Defaults| DefaultSettings[- Level M]
+    CustomizeOptions -->|Use Defaults| DefaultSettings[Default Settings:<br>- Black<br>- 256x256px<br>- Level M]
     CustomizeOptions -->|Customize Style| CustomSettings[Custom Settings]
 
     CustomSettings --> SelectColor[Select Color]
-    SelectColor --> SelectSize[128/256/512px]
-    SelectSize --> SelectLevel[L/M/Q/H]
+    SelectColor --> SelectSize[Select Size:<br>128/256/512px]
+    SelectSize --> SelectLevel[Select Error Correction:<br>L/M/Q/H]
     SelectLevel --> PreviewSettings
 
     DefaultSettings --> PreviewSettings[Real-time Preview]
@@ -24,7 +24,7 @@ flowchart TD
     UserAction -->|Re-customize| CustomSettings
     UserAction -->|Download PNG| ExportPNG[Export as PNG]
     UserAction -->|Download SVG| ExportSVG[Export as SVG]
-    UserAction -->|Cancel|End
+    UserAction -->|Cancel| End
 
     ExportPNG --> SaveLocal[Save to Local Device]
     ExportSVG --> SaveLocal
@@ -49,11 +49,13 @@ flowchart TD
 #### 2. 自定义选项
 用户可选择以下配置：
 
-| 配置项 |选项 | 说明 |
+| 配置项 | 选项 | 说明 |
 |--------|------|------|
-| **颜色** |黑色/蓝色/红色/自定义 | QR 码前景色 |
+| **颜色** | 黑色/蓝色/红色/自定义 | QR 码前景色 |
 | **尺寸** | 128×128 / 256×256 / 512×512 | 像素尺寸 |
-| **纠错级别** | L (7%) / M (15%) / Q (25%) / H (30%) | 容错能力 |#### 3. 实时预览
+| **纠错级别** | L (7%) / M (15%) / Q (25%) / H (30%) | 容错能力 |
+
+#### 3. 实时预览
 - 使用 **qrcode.js** 或 **vue-qrcode** 库
 - 在浏览器中即时生成 QR 码（无需后端）
 - 显示预览图，支持实时调整
@@ -100,7 +102,7 @@ QRCode.toCanvas(canvas, shortURL, {
 
 ### 纠错级别说明
 
-| 级别 |容错率 | 适用场景 |
+| 级别 | 容错率 | 适用场景 |
 |------|--------|----------|
 | **L** | 7% | 干净环境，短期使用 |
 | **M** | 15% | 一般使用（推荐） |

@@ -3,84 +3,84 @@
 
 ```mermaid
 sequenceDiagram
-    participant Client as Client
-    participant Controller as LandingPageController
-    participant Service as LandingPageService
-    participant Repository as LandingPageRepository
-    participant Sanitizer as HTML 清理
-    participant Redis as Cache
-    participant DB as Database
+    participant Client as 客户端<br>Client
+    participant Controller as 控制器<br>LandingPageController
+    participant Service as 服务层<br>LandingPageService
+    participant Repository as 仓储层<br>LandingPageRepository
+    participant Sanitizer as DOMPurify<br>HTML 清理
+    participant Redis as Redis<br>缓存
+    participant DB as PostgreSQL<br>数据库
 
-    Note over Client,DB: Create Landing Page
+    Note over Client,DB: 创建落地页流程 Create Landing Page
 
-    Client->>Controller: {link_id, html_content, css_content, template_id}
-    Controller->>Controller: Verify JWT
-    Controller->>Controller: Verify Link Ownership
+    Client->>Controller: POST /api/landing-pages<br>{link_id, html_content, css_content, template_id}
+    Controller->>Controller: 验证 JWT<br>Verify JWT
+    Controller->>Controller: 验证权限<br>Verify Link Ownership
 
     Controller->>Service: createLandingPage(user_id, data)
 
     Service->>Repository: findLinkById(link_id)
-    Repository->>Controller: WHERE id = ? AND user_id = ?
+    Repository->>DB: SELECT * FROM short_links<br>WHERE id = ? AND user_id = ?
     DB-->>Repository: Link Object
     Repository-->>Service: Link Object
 
-    alt Link Not Found or Unauthorized
+    alt 链接不存在或无权限 Link Not Found or Unauthorized
         Service-->>Controller: Error: Not Found
         Controller-->>Client: 404 Not Found
-    else Continue Creation
+    else 继续创建 Continue Creation
         Service->>Sanitizer: sanitize(html_content)
-        Sanitizer->>Controller: Remove Malicious Scripts
-        Sanitizer->>Controller: Validate Tag Whitelist
+        Sanitizer->>Sanitizer: 移除恶意脚本<br>Remove Malicious Scripts
+        Sanitizer->>Sanitizer: 验证标签白名单<br>Validate Tag Whitelist
         Sanitizer-->>Service: Cleaned HTML
 
         Service->>Sanitizer: sanitize(css_content)
-        Sanitizer->>Controller: Remove Malicious Styles
+        Sanitizer->>Sanitizer: 移除恶意样式<br>Remove Malicious Styles
         Sanitizer-->>Service: Cleaned CSS
 
         Service->>Repository: create({link_id, html_content, css_content, template_id})
-        Repository->>Controller: (template_id, created_at)
+        Repository->>DB: INSERT INTO landing_pages<br>(link_id, html_content, css_content,<br>template_id, created_at)
         DB-->>Repository: Landing Page ID: 98765
         Repository-->>Service: Landing Page Object
 
-        Service->>Controller: TTL: 24h
+        Service->>Redis: SET landingpage:{link_id}<br>html_content<br>TTL: 24h
         Redis-->>Service: OK
 
         Service-->>Controller: Landing Page Object
-        Controller-->>Controller: {landing_page: {...}}
+        Controller-->>Client: 201 Created<br>{landing_page: {...}}
     end
 
-    Note over Client,DB: Get Landing Page Editor
+    Note over Client,DB: 获取落地页编辑器 Get Landing Page Editor
 
     Client->>Controller: GET /api/landing-pages/:link_id/editor
-    Controller->>Controller: Verify JWT
-    Controller->>Controller: Verify Ownership
+    Controller->>Controller: 验证 JWT<br>Verify JWT
+    Controller->>Controller: 验证权限<br>Verify Ownership
 
     Controller->>Service: getEditorData(link_id, user_id)
 
     Service->>Repository: findByLinkId(link_id)
-    Repository->>Controller: WHERE link_id = ?
+    Repository->>DB: SELECT * FROM landing_pages<br>WHERE link_id = ?
     DB-->>Repository: Landing Page Object (or null)
     Repository-->>Service: Landing Page Object
 
-    alt Existing Landing Page
-        Service-->>Controller: {}
-        Controller-->>Controller: {landing_page: {...}}
+    alt 已有落地页 Existing Landing Page
+        Service-->>Controller: {<br>  html_content,<br>  css_content,<br>  template_id<br>}
+        Controller-->>Client: 200 OK<br>{landing_page: {...}}
     else 无落地页,返回空模板 No Landing Page, Return Empty Template
-        Service->>Controller: Load Default Template
-        Service-->>Controller: {}
-        Controller-->>Controller: {landing_page: {...}}
+        Service->>Service: 加载默认模板<br>Load Default Template
+        Service-->>Controller: {<br>  html_content: default_template,<br>  css_content: default_styles,<br>  template_id: null<br>}
+        Controller-->>Client: 200 OK<br>{landing_page: {...}}
     end
 
-    Note over Client,DB: Update Landing Page
+    Note over Client,DB: 更新落地页 Update Landing Page
 
-    Client->>Controller: {html_content, css_content}
-    Controller->>Controller: Verify JWT
-    Controller->>Controller: Verify Ownership
+    Client->>Controller: PUT /api/landing-pages/:link_id<br>{html_content, css_content}
+    Controller->>Controller: 验证 JWT<br>Verify JWT
+    Controller->>Controller: 验证权限<br>Verify Ownership
 
     Controller->>Service: updateLandingPage(link_id, user_id, data)
 
     Service->>Repository: findByLinkId(link_id)
-    Repository->>Controller: WHERE link_id = ?
+    Repository->>DB: SELECT * FROM landing_pages<br>WHERE link_id = ?
     DB-->>Repository: Landing Page Object
     Repository-->>Service: Landing Page Object
 
@@ -91,57 +91,57 @@ sequenceDiagram
     Sanitizer-->>Service: Cleaned CSS
 
     Service->>Repository: update(link_id, {html_content, css_content, updated_at})
-    Repository->>Controller:     css_content = ?,<br>    updated_at = NOW()<br>WHERE link_id = ?
+    Repository->>DB: UPDATE landing_pages<br>SET html_content = ?,<br>    css_content = ?,<br>    updated_at = NOW()<br>WHERE link_id = ?
     DB-->>Repository: Updated Landing Page
     Repository-->>Service: Landing Page Object
 
-    Service->>Controller: TTL: 24h
+    Service->>Redis: SET landingpage:{link_id}<br>html_content<br>TTL: 24h
     Redis-->>Service: OK
 
     Service-->>Controller: Updated Landing Page
-    Controller-->>Controller: {landing_page: {...}}
+    Controller-->>Client: 200 OK<br>{landing_page: {...}}
 
-    Note over Client,DB: Render Landing Page
+    Note over Client,DB: 渲染落地页 Render Landing Page
 
     Client->>Controller: GET /l/:short_code
     Controller->>Service: renderLandingPage(short_code)
 
     Service->>Redis: GET landingpage:code:{short_code}
-    alt Cache Hit
+    alt 缓存命中 Cache Hit
         Redis-->>Service: Cached HTML
         Service-->>Controller: Full HTML
-        Controller-->>Controller: <!DOCTYPE html>...
-    else Cache Miss
+        Controller-->>Client: 200 OK<br>Content-Type: text/html<br><!DOCTYPE html>...
+    else 缓存未命中 Cache Miss
         Service->>Repository: findLinkByShortCode(short_code)
-        Repository->>Controller: WHERE short_code = ?
+        Repository->>DB: SELECT * FROM short_links<br>WHERE short_code = ?
         DB-->>Repository: Link Object
         Repository-->>Service: Link Object
 
         Service->>Repository: findByLinkId(link.id)
-        Repository->>Controller: WHERE link_id = ?
+        Repository->>DB: SELECT * FROM landing_pages<br>WHERE link_id = ?
         DB-->>Repository: Landing Page Object
         Repository-->>Service: Landing Page Object
 
-        alt No Landing Page
-            Service->>Controller: Redirect Directly
+        alt 无落地页 No Landing Page
+            Service->>Service: 直接重定向<br>Redirect Directly
             Service-->>Controller: Redirect to original_url
-            Controller-->>Controller: Location: {original_url}
-        else Has Landing Page
-            Service->>Controller: (head + body + styles)
-            Service->>Controller: Inject Analytics Script
+            Controller-->>Client: 302 Redirect<br>Location: {original_url}
+        else 有落地页 Has Landing Page
+            Service->>Service: 构建完整 HTML<br>Build Full HTML<br>(head + body + styles)
+            Service->>Service: 注入统计脚本<br>Inject Analytics Script
 
-            Service->>Controller: TTL: 24h
+            Service->>Redis: SET landingpage:code:{short_code}<br>full_html<br>TTL: 24h
             Redis-->>Service: OK
 
             Service-->>Controller: Full HTML
-            Controller-->>Controller: <!DOCTYPE html>...
+            Controller-->>Client: 200 OK<br>Content-Type: text/html<br><!DOCTYPE html>...
         end
     end
 
-    Note over Client,DB: Preview Landing Page
+    Note over Client,DB: 预览落地页 Preview Landing Page
 
-    Client->>Controller: {html_content, css_content}
-    Controller->>Controller: Verify JWT
+    Client->>Controller: POST /api/landing-pages/preview<br>{html_content, css_content}
+    Controller->>Controller: 验证 JWT<br>Verify JWT
 
     Controller->>Service: previewLandingPage(html, css)
 
@@ -151,31 +151,31 @@ sequenceDiagram
     Service->>Sanitizer: sanitize(css_content)
     Sanitizer-->>Service: Cleaned CSS
 
-    Service->>Controller: Build Preview HTML
+    Service->>Service: 构建预览 HTML<br>Build Preview HTML
     Service-->>Controller: Preview HTML
 
-    Controller-->>Controller: <!DOCTYPE html>...
+    Controller-->>Client: 200 OK<br>Content-Type: text/html<br><!DOCTYPE html>...
 
-    Note over Client,DB: Delete Landing Page
+    Note over Client,DB: 删除落地页 Delete Landing Page
 
     Client->>Controller: DELETE /api/landing-pages/:link_id
-    Controller->>Controller: Verify JWT
-    Controller->>Controller: Verify Ownership
+    Controller->>Controller: 验证 JWT<br>Verify JWT
+    Controller->>Controller: 验证权限<br>Verify Ownership
 
     Controller->>Service: deleteLandingPage(link_id, user_id)
 
     Service->>Repository: findByLinkId(link_id)
-    Repository->>Controller: WHERE link_id = ?
+    Repository->>DB: SELECT * FROM landing_pages<br>WHERE link_id = ?
     DB-->>Repository: Landing Page Object
     Repository-->>Service: Landing Page Object
 
     Service->>Repository: delete(link_id)
-    Repository->>Controller: WHERE link_id = ?
+    Repository->>DB: DELETE FROM landing_pages<br>WHERE link_id = ?
     DB-->>Repository: OK
     Repository-->>Service: Success
 
     Service->>Repository: findLinkById(link_id)
-    Repository->>Controller: WHERE id = ?
+    Repository->>DB: SELECT short_code<br>FROM short_links<br>WHERE id = ?
     DB-->>Repository: {short_code}
     Repository-->>Service: {short_code}
 
@@ -225,7 +225,7 @@ function sanitizeHTML(html: string): string {
       'class', 'id', 'href', 'src', 'alt', 'title',
       'width', 'height', 'style', 'target', 'rel'
     ],
-    ALLOWED_URI_REGEXP: /^(?:(?:https?|// 仅允许 https/http/mailto
+    ALLOWED_URI_REGEXP: /^(?:(?:https?|mailto):)/,  // 仅允许 https/http/mailto
     FORBID_TAGS: ['script', 'iframe', 'object', 'embed'],
     FORBID_ATTR: ['onerror', 'onload', 'onclick', 'onmouseover']
   })
@@ -563,26 +563,26 @@ cssEditor.onDidChangeModelContent(() => {
 
 ### 🔒 安全措施
 
-| 措施 |实现方式 |
+| 措施 | 实现方式 |
 |------|----------|
-| **XSS 防护** |DOMPurify 清理所有 HTML/CSS |
-|**标签白名单** | 仅允许安全的 HTML 标签 |
-| **属性过滤** |禁止 `onerror`/`onclick` 等事件属性 |
-|**URL 验证** | 仅允许 `http`/`https`/`mailto` 协议 |
-| **CSS 清理** |移除 `@import`/`expression`/`behavior` |
-|**权限验证** | 验证用户对链接的所有权 |
+| **XSS 防护** | DOMPurify 清理所有 HTML/CSS |
+| **标签白名单** | 仅允许安全的 HTML 标签 |
+| **属性过滤** | 禁止 `onerror`/`onclick` 等事件属性 |
+| **URL 验证** | 仅允许 `http`/`https`/`mailto` 协议 |
+| **CSS 清理** | 移除 `@import`/`expression`/`behavior` |
+| **权限验证** | 验证用户对链接的所有权 |
 | **内容大小限制** | HTML < 500KB, CSS < 100KB |
 
 ---
 
 ### ⚡ 性能优化
 
-|策略 | 效果 |
+| 策略 | 效果 |
 |------|------|
-| **Redis 缓存** |完整 HTML 缓存 24h,减少 DB 查询 |
-|**CDN 加载** | TailwindCSS 从 CDN 加载 |
-| **预览防抖** |500ms 防抖,避免频繁请求 |
-|**gzip 压缩** | Nginx 启用 gzip,减少传输大小 |
+| **Redis 缓存** | 完整 HTML 缓存 24h,减少 DB 查询 |
+| **CDN 加载** | TailwindCSS 从 CDN 加载 |
+| **预览防抖** | 500ms 防抖,避免频繁请求 |
+| **gzip 压缩** | Nginx 启用 gzip,减少传输大小 |
 
 ---
 

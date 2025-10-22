@@ -3,24 +3,24 @@
 
 ```mermaid
 graph TB
-    User([User])
-    APIClient([API Client])
+    User([用户<br>User])
+    APIClient([API客户端<br>API Client])
 
-    subgraph "API Management System"
-        CreateAPIKey[Create API Key]
-        RevokeAPIKey[Revoke API Key]
-        ViewAPIUsage[View API Usage]
+    subgraph "API管理系统<br>API Management System"
+        CreateAPIKey[创建API密钥<br>Create API Key]
+        RevokeAPIKey[撤销API密钥<br>Revoke API Key]
+        ViewAPIUsage[查看API使用情况<br>View API Usage]
 
-        BatchImport[Batch Import Links]
-        BatchExport[Batch Export Data]
-        BatchUpdate[Batch Update Links]
-        BatchDelete[Batch Delete Links]
+        BatchImport[批量导入链接<br>Batch Import Links]
+        BatchExport[批量导出数据<br>Batch Export Data]
+        BatchUpdate[批量更新链接<br>Batch Update Links]
+        BatchDelete[批量删除链接<br>Batch Delete Links]
     end
 
-    APIGateway[API Gateway]
-    RateLimiter[Rate Limiter]
-    Database[Database)]
-    Redis[缓存)]
+    APIGateway[API网关<br>API Gateway]
+    RateLimiter[速率限制器<br>Rate Limiter]
+    Database[(数据库<br>Database)]
+    Redis[(Redis<br>缓存)]
 
     User -->|创建密钥| CreateAPIKey
     User -->|撤销密钥| RevokeAPIKey
@@ -51,7 +51,7 @@ graph TB
     BatchImport -->|批量创建| Database
     BatchExport -->|批量查询| Database
     BatchUpdate -->|批量更新| Database
-    BatchDelete -->|批量删除|Database
+    BatchDelete -->|批量删除| Database
 
     style User fill:#10B981,color:#fff
     style APIClient fill:#8B5CF6,color:#fff
@@ -253,10 +253,10 @@ echo "数据已导出到 links_backup_$DATE.csv"
 
 ## 安全措施
 
-| 措施 |说明 |
+| 措施 | 说明 |
 |------|------|
-| **密钥哈希** |API 密钥使用 SHA256 哈希后存储 |
+| **密钥哈希** | API 密钥使用 SHA256 哈希后存储 |
 | **HTTPS** | 强制使用 HTTPS 传输 |
-| **速率限制** |防止滥用,保护系统资源 |
-|**权限控制** | 只读/读写权限分离 |
-| **即时撤销** |撤销密钥后立即失效 |
+| **速率限制** | 防止滥用,保护系统资源 |
+| **权限控制** | 只读/读写权限分离 |
+| **即时撤销** | 撤销密钥后立即失效 |

@@ -5,25 +5,25 @@
 graph TB
     subgraph "链接模块 Link Module"
         subgraph "控制器层 Controller Layer"
-            LinkController[LinkController]
-            RedirectController[RedirectController]
+            LinkController[链接控制器<br>LinkController]
+            RedirectController[重定向控制器<br>RedirectController]
         end
 
         subgraph "服务层 Service Layer"
-            LinkService[LinkService]
-            ShortCodeGenerator[ShortCodeGenerator]
-            ClickLogger[ClickLogger]
+            LinkService[链接服务<br>LinkService]
+            ShortCodeGenerator[短码生成器<br>ShortCodeGenerator]
+            ClickLogger[点击日志记录<br>ClickLogger]
         end
 
         subgraph "仓储层 Repository Layer"
-            LinkRepository[LinkRepository]
-            ClickLogRepository[ClickLogRepository]
+            LinkRepository[链接仓储<br>LinkRepository]
+            ClickLogRepository[点击日志仓储<br>ClickLogRepository]
         end
 
         subgraph "工具组件 Utilities"
-            Base62Encoder[Base62 Encoder]
-            BloomFilter[Bloom Filter]
-            URLValidator[URL Validator]
+            Base62Encoder[Base62编码器<br>Base62 Encoder]
+            BloomFilter[布隆过滤器<br>Bloom Filter]
+            URLValidator[URL验证器<br>URL Validator]
         end
     end
 
@@ -56,7 +56,7 @@ graph TB
     LinkRepository -->|缓存| Redis
     ClickLogRepository -->|写入| Database
 
-    BloomFilter -.->|快速查询|Redis
+    BloomFilter -.->|快速查询| Redis
 
     style LinkController fill:#3B82F6,color:#fff
     style RedirectController fill:#10B981,color:#fff
@@ -154,7 +154,7 @@ class BloomFilter {
 
 ## API 端点
 
-| 方法 |路径 | 说明 |
+| 方法 | 路径 | 说明 |
 |------|------|------|
 | POST | /api/links | 创建短链接 |
 | GET | /api/links | 获取链接列表 |

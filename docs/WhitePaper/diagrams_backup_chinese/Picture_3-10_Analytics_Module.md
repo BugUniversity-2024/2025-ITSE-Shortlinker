@@ -5,24 +5,24 @@
 graph TB
     subgraph "分析模块 Analytics Module"
         subgraph "控制器层 Controller Layer"
-            AnalyticsController[AnalyticsController]
+            AnalyticsController[分析控制器<br>AnalyticsController]
         end
 
         subgraph "服务层 Service Layer"
-            AnalyticsService[AnalyticsService]
-            DataAggregator[DataAggregator]
-            ExportService[ExportService]
+            AnalyticsService[分析服务<br>AnalyticsService]
+            DataAggregator[数据聚合器<br>DataAggregator]
+            ExportService[导出服务<br>ExportService]
         end
 
         subgraph "仓储层 Repository Layer"
-            ClickLogRepository[ClickLogRepository]
+            ClickLogRepository[点击日志仓储<br>ClickLogRepository]
         end
 
         subgraph "工具组件 Utilities"
-            GeoIPParser[GeoIP Parser]
-            UAParser[User-Agent Parser]
-            ChartFormatter[Chart Formatter]
-            CSVExporter[CSV Exporter]
+            GeoIPParser[GeoIP解析器<br>GeoIP Parser]
+            UAParser[UA解析器<br>User-Agent Parser]
+            ChartFormatter[图表格式化<br>Chart Formatter]
+            CSVExporter[CSV导出器<br>CSV Exporter]
         end
     end
 
@@ -48,7 +48,7 @@ graph TB
     ExportService -->|生成CSV| CSVExporter
 
     ClickLogRepository -->|读取| Database
-    ClickLogRepository -->|缓存|Redis
+    ClickLogRepository -->|缓存| Redis
 
     style AnalyticsController fill:#3B82F6,color:#fff
     style AnalyticsService fill:#FFF9C4
@@ -101,7 +101,7 @@ GROUP BY device_type
 
 ## API 端点
 
-| 方法 |路径 | 说明 |
+| 方法 | 路径 | 说明 |
 |------|------|------|
 | GET | /api/analytics/:id | 获取链接分析数据 |
 | GET | /api/analytics/:id/realtime | 获取实时统计 |

@@ -3,18 +3,18 @@
 
 ```mermaid
 graph TB
-    User([User])
+    User([用户<br>User])
 
-    subgraph "QR Code Generation System"
-        GenerateQR[Generate QR Code]
-        CustomizeStyle[Customize Style]
-        PreviewQR[Preview QR Code]
-        DownloadQR[Download QR Code]
-        ChooseFormat[Choose Format]
+    subgraph "二维码生成系统<br>QR Code Generation System"
+        GenerateQR[生成二维码<br>Generate QR Code]
+        CustomizeStyle[自定义样式<br>Customize Style]
+        PreviewQR[预览二维码<br>Preview QR Code]
+        DownloadQR[下载二维码<br>Download QR Code]
+        ChooseFormat[选择格式<br>Choose Format]
     end
 
-    Browser[Browser]
-    QRCodeLib[QR Code Library]
+    Browser[浏览器<br>Browser]
+    QRCodeLib[qrcode.js<br>QR Code Library]
 
     User -->|生成| GenerateQR
     User -->|自定义| CustomizeStyle
@@ -35,7 +35,7 @@ graph TB
     DownloadQR -->|PNG格式| Browser
     DownloadQR -->|SVG格式| Browser
 
-    QRCodeLib -->|客户端渲染|Browser
+    QRCodeLib -->|客户端渲染| Browser
 
     style User fill:#10B981,color:#fff
     style GenerateQR fill:#3B82F6,color:#fff
@@ -101,12 +101,14 @@ async function generateQRCode(url) {
 
 **可自定义选项**:
 
-| 选项 |可选值 | 默认值 |
+| 选项 | 可选值 | 默认值 |
 |------|--------|--------|
-| **颜色** |任意 HEX 颜色 | #000000 (黑色) |
-| **背景色** |任意 HEX 颜色 | #FFFFFF (白色) |
+| **颜色** | 任意 HEX 颜色 | #000000 (黑色) |
+| **背景色** | 任意 HEX 颜色 | #FFFFFF (白色) |
 | **尺寸** | 128x128 ~ 1024x1024 | 300x300 |
-| **纠错等级** | L (7%) / M (15%) / Q (25%) / H (30%) | M (15%) |**纠错等级说明**:
+| **纠错等级** | L (7%) / M (15%) / Q (25%) / H (30%) | M (15%) |
+
+**纠错等级说明**:
 - **L**: 可恢复 7% 的数据损坏 (适合完美打印环境)
 - **M**: 可恢复 15% 的数据损坏 (推荐,平衡扫描速度和容错)
 - **Q**: 可恢复 25% 的数据损坏 (适合户外/易损环境)
@@ -232,18 +234,20 @@ function downloadSVG(url, shortCode) {
 
 ### 技术栈
 
-| 组件 |技术 | 说明 |
+| 组件 | 技术 | 说明 |
 |------|------|------|
 | **前端库** | qrcode.js / vue-qrcode | 轻量级二维码生成库 |
 | **渲染方式** | Canvas / SVG | Canvas 用于 PNG,SVG 用于矢量 |
-| **下载方式** | Blob API + URL.createObjectURL | 纯前端下载,无需后端 |---
+| **下载方式** | Blob API + URL.createObjectURL | 纯前端下载,无需后端 |
+
+---
 
 ### 兼容性
 
-| 浏览器 |支持情况 |
+| 浏览器 | 支持情况 |
 |--------|----------|
-| **Chrome** |✅ 完全支持 |
+| **Chrome** | ✅ 完全支持 |
 | **Firefox** | ✅ 完全支持 |
-| **Safari** |✅ 完全支持 |
+| **Safari** | ✅ 完全支持 |
 | **Edge** | ✅ 完全支持 |
-| **移动端浏览器** |✅ 完全支持 |
+| **移动端浏览器** | ✅ 完全支持 |

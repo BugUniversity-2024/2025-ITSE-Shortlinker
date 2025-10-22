@@ -3,69 +3,69 @@
 
 ```mermaid
 flowchart TD
-    Start([开始 Start]) --> LinkDetail[Enter Link Detail Page]
-    LinkDetail --> ClickCreate[Click Create Landing Page]
-    ClickCreate --> BrowseTemplates[Browse Template Library]
+    Start([开始 Start]) --> LinkDetail[进入链接详情页<br>Enter Link Detail Page]
+    LinkDetail --> ClickCreate[点击创建落地页<br>Click Create Landing Page]
+    ClickCreate --> BrowseTemplates[浏览模板库<br>Browse Template Library]
 
-    BrowseTemplates --> FilterCategory{Select Category}
-    FilterCategory -->|Page| ProductTemplate[Product Template]
-    FilterCategory -->|Promotion| EventTemplate[Event Template]
-    FilterCategory -->|Collection| FormTemplate[Form Template]
-    FilterCategory -->|Announcement| AnnouncementTemplate[Announcement Template]
+    BrowseTemplates --> FilterCategory{选择分类<br>Select Category}
+    FilterCategory -->|产品介绍<br>Product Page| ProductTemplate[产品页模板<br>Product Template]
+    FilterCategory -->|活动推广<br>Event Promotion| EventTemplate[活动页模板<br>Event Template]
+    FilterCategory -->|表单收集<br>Form Collection| FormTemplate[表单模板<br>Form Template]
+    FilterCategory -->|公告通知<br>Announcement| AnnouncementTemplate[公告模板<br>Announcement Template]
 
-    ProductTemplate --> SelectTemplate[Select Template]
+    ProductTemplate --> SelectTemplate[选择模板<br>Select Template]
     EventTemplate --> SelectTemplate
     FormTemplate --> SelectTemplate
     AnnouncementTemplate --> SelectTemplate
 
-    SelectTemplate --> EditorMode{Editor Mode}
-    EditorMode -->|Form Editor| FormEditor[Form-based Editor]
-    EditorMode -->|Code Editor| CodeEditor[Monaco Editor]
+    SelectTemplate --> EditorMode{编辑模式<br>Editor Mode}
+    EditorMode -->|表单编辑<br>Form Editor| FormEditor[表单编辑器<br>Form-based Editor]
+    EditorMode -->|代码编辑<br>Code Editor| CodeEditor[Monaco 编辑器<br>Monaco Editor]
 
-    FormEditor --> EditContent[Edit Content]
-    EditContent --> UploadImage[Upload Images]
-    UploadImage --> EditText[Edit Text]
-    EditText --> AdjustColor[Adjust Colors]
-    AdjustColor --> ConfigCTA[Configure CTA Button]
+    FormEditor --> EditContent[编辑内容<br>Edit Content]
+    EditContent --> UploadImage[上传图片<br>Upload Images]
+    UploadImage --> EditText[修改文本<br>Edit Text]
+    EditText --> AdjustColor[调整颜色<br>Adjust Colors]
+    AdjustColor --> ConfigCTA[配置 CTA 按钮<br>Configure CTA Button]
     ConfigCTA --> Preview
 
-    CodeEditor --> EditHTML[Edit HTML]
-    EditHTML --> EditCSS[Edit CSS]
-    EditCSS --> Preview[Real-time Preview]
+    CodeEditor --> EditHTML[编辑 HTML<br>Edit HTML]
+    EditHTML --> EditCSS[编辑 CSS<br>Edit CSS]
+    EditCSS --> Preview[实时预览<br>Real-time Preview]
 
-    Preview --> PreviewMode{Preview Device}
-    PreviewMode -->|桌面 Desktop| DesktopView[1920×1080]
-    PreviewMode -->|移动端 Mobile| MobileView[375×667]
-    PreviewMode -->|平板 Tablet| TabletView[768×1024]
+    Preview --> PreviewMode{预览设备<br>Preview Device}
+    PreviewMode -->|桌面 Desktop| DesktopView[桌面预览<br>Desktop View<br>1920×1080]
+    PreviewMode -->|移动端 Mobile| MobileView[移动预览<br>Mobile View<br>375×667]
+    PreviewMode -->|平板 Tablet| TabletView[平板预览<br>Tablet View<br>768×1024]
 
-    DesktopView --> CheckPreview{Satisfied?}
+    DesktopView --> CheckPreview{是否满意<br>Satisfied?}
     MobileView --> CheckPreview
     TabletView --> CheckPreview
 
     CheckPreview -->|否 No| EditContent
-    CheckPreview -->|是 Yes| Publish{Choose Action}
+    CheckPreview -->|是 Yes| Publish{操作选择<br>Choose Action}
 
-    Publish -->|Save Draft| SaveDraft[Save to Database]
-    Publish -->|Publish| PublishPage[Publish Landing Page]
-    Publish -->|Export HTML|ExportHTML[Export HTML File]
+    Publish -->|保存草稿<br>Save Draft| SaveDraft[保存到数据库<br>Save to Database]
+    Publish -->|发布<br>Publish| PublishPage[发布落地页<br>Publish Landing Page]
+    Publish -->|导出 HTML<br>Export HTML| ExportHTML[导出 HTML 文件<br>Export HTML File]
 
-    SaveDraft --> DraftSaved[Draft Saved]
+    SaveDraft --> DraftSaved[草稿已保存<br>Draft Saved]
     DraftSaved --> End([结束 End])
 
-    PublishPage --> SaveDB[Save HTML/CSS to DB]
-    SaveDB --> UpdateRoute[Update Route Config]
-    UpdateRoute --> ConfigRoute{Route Mode}
+    PublishPage --> SaveDB[保存 HTML/CSS 到 DB<br>Save HTML/CSS to DB]
+    SaveDB --> UpdateRoute[更新路由配置<br>Update Route Config]
+    UpdateRoute --> ConfigRoute{路由模式<br>Route Mode}
 
-    ConfigRoute -->|Landing Page Mode| SetLanding[Access /l/:short_code]
-    ConfigRoute -->|Redirect Mode|SetRedirect[Access /:short_code]
+    ConfigRoute -->|落地页模式<br>Landing Page Mode| SetLanding[访问 /l/:short_code<br>显示落地页<br>Access /l/:short_code]
+    ConfigRoute -->|重定向模式<br>Redirect Mode| SetRedirect[访问 /:short_code<br>直接重定向<br>Access /:short_code]
 
-    SetLanding --> TestLive[Test Live Page]
+    SetLanding --> TestLive[测试上线<br>Test Live Page]
     SetRedirect --> TestLive
 
-    TestLive --> PublishSuccess[Publish Success]
+    TestLive --> PublishSuccess[发布成功<br>Publish Success]
     PublishSuccess --> End
 
-    ExportHTML --> Download[Download HTML File]
+    ExportHTML --> Download[下载 HTML 文件<br>Download HTML File]
     Download --> End
 
     style Start fill:#90EE90
@@ -83,12 +83,12 @@ flowchart TD
 
 **模板分类：**
 
-| 分类 |适用场景 | 包含组件 |
+| 分类 | 适用场景 | 包含组件 |
 |------|----------|----------|
-| **产品介绍** |产品发布、功能展示 | Hero Banner, Feature Cards, Product Gallery, FAQ |
-| **活动推广** |线上/线下活动 | Countdown Timer, Event Details, Testimonials, Registration CTA |
-| **表单收集** |问卷调查、信息登记 | Form Fields, Submit Button, Privacy Notice |
-| **公告通知** |通知、声明 | Title, Content Block, Share Buttons |
+| **产品介绍** | 产品发布、功能展示 | Hero Banner, Feature Cards, Product Gallery, FAQ |
+| **活动推广** | 线上/线下活动 | Countdown Timer, Event Details, Testimonials, Registration CTA |
+| **表单收集** | 问卷调查、信息登记 | Form Fields, Submit Button, Privacy Notice |
+| **公告通知** | 通知、声明 | Title, Content Block, Share Buttons |
 
 每个模板都提供：
 - 📱 **响应式布局**（TailwindCSS）

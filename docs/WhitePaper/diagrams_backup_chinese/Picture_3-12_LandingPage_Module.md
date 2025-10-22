@@ -5,23 +5,23 @@
 graph TB
     subgraph "落地页模块 Landing Page Module"
         subgraph "控制器层 Controller Layer"
-            LandingController[LandingPageController]
-            RenderController[RenderController]
+            LandingController[落地页控制器<br>LandingPageController]
+            RenderController[渲染控制器<br>RenderController]
         end
 
         subgraph "服务层 Service Layer"
-            LandingService[LandingPageService]
-            TemplateService[TemplateService]
-            RenderService[RenderService]
+            LandingService[落地页服务<br>LandingPageService]
+            TemplateService[模板服务<br>TemplateService]
+            RenderService[渲染服务<br>RenderService]
         end
 
         subgraph "仓储层 Repository Layer"
-            LandingRepository[LandingPageRepository]
+            LandingRepository[落地页仓储<br>LandingPageRepository]
         end
 
         subgraph "工具组件 Utilities"
-            DOMPurify[DOMPurify]
-            TemplateEngine[Template Engine]
+            DOMPurify[HTML清理器<br>DOMPurify]
+            TemplateEngine[模板引擎<br>Template Engine]
         end
     end
 
@@ -51,7 +51,7 @@ graph TB
     RenderService -->|构建HTML| RenderService
 
     LandingRepository -->|读写| Database
-    LandingRepository -->|缓存|Redis
+    LandingRepository -->|缓存| Redis
 
     style LandingController fill:#3B82F6,color:#fff
     style RenderController fill:#10B981,color:#fff
@@ -67,7 +67,7 @@ graph TB
 
 ## API 端点
 
-| 方法 |路径 | 说明 |
+| 方法 | 路径 | 说明 |
 |------|------|------|
 | GET | /api/landing-pages/:id/editor | 获取编辑器数据 |
 | PUT | /api/landing-pages/:id | 更新落地页 |

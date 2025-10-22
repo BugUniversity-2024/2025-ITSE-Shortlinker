@@ -3,19 +3,19 @@
 
 ```mermaid
 graph TB
-    User([User])
+    User([用户<br>User])
 
-    subgraph "Login & Registration System"
-        Register[Register Account]
-        VerifyEmail[Verify Email]
-        Login[Login to Account]
-        ForgotPassword[Forgot Password]
-        ResetPassword[Reset Password]
-        Logout[Logout]
+    subgraph "登录与注册系统<br>Login & Registration System"
+        Register[注册账号<br>Register Account]
+        VerifyEmail[验证邮箱<br>Verify Email]
+        Login[登录账号<br>Login to Account]
+        ForgotPassword[忘记密码<br>Forgot Password]
+        ResetPassword[重置密码<br>Reset Password]
+        Logout[登出<br>Logout]
     end
 
-    Database[Database)]
-    EmailService[Email Service]
+    Database[(数据库<br>Database)]
+    EmailService[邮件服务<br>Email Service]
 
     User -->|注册| Register
     User -->|验证| VerifyEmail
@@ -39,7 +39,7 @@ graph TB
     ResetPassword -->|验证令牌| Database
     ResetPassword -->|更新密码| Database
 
-    Logout -.->|使Token失效|Database
+    Logout -.->|使Token失效| Database
 
     style User fill:#10B981,color:#fff
     style Register fill:#3B82F6,color:#fff
@@ -171,9 +171,9 @@ graph TB
 
 ### 非功能需求
 
-| 需求类型 |指标 |
+| 需求类型 | 指标 |
 |----------|------|
-| **性能** |登录响应时间 < 200ms |
-|**安全** | 密码使用 Argon2 哈希 (内存成本 64MB) |
-| **可用性** |登录失败 5 次锁定 15 分钟 |
-|**隐私** | 密码不可逆加密,永不明文存储 |
+| **性能** | 登录响应时间 < 200ms |
+| **安全** | 密码使用 Argon2 哈希 (内存成本 64MB) |
+| **可用性** | 登录失败 5 次锁定 15 分钟 |
+| **隐私** | 密码不可逆加密,永不明文存储 |

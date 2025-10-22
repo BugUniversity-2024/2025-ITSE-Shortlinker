@@ -3,26 +3,26 @@
 
 ```mermaid
 graph TB
-    User([User])
-    Visitor([Visitor])
+    User([用户<br>User])
+    Visitor([访客<br>Visitor])
 
-    subgraph "Landing Page Editor System"
-        BrowseTemplates[Browse Templates]
-        SelectTemplate[Select Template]
-        EditContent[Edit Content]
-        CustomizeStyle[Customize Style]
-        PreviewPage[Real-time Preview]
-        PublishPage[Publish Page]
-        UnpublishPage[Unpublish Page]
-        ExportHTML[Export HTML]
-        CodeEditor[Code Editor]
+    subgraph "落地页编辑系统<br>Landing Page Editor System"
+        BrowseTemplates[浏览模板库<br>Browse Templates]
+        SelectTemplate[选择模板<br>Select Template]
+        EditContent[编辑内容<br>Edit Content]
+        CustomizeStyle[自定义样式<br>Customize Style]
+        PreviewPage[实时预览<br>Real-time Preview]
+        PublishPage[发布落地页<br>Publish Page]
+        UnpublishPage[取消发布<br>Unpublish Page]
+        ExportHTML[导出HTML<br>Export HTML]
+        CodeEditor[代码编辑器<br>Code Editor]
     end
 
-    TemplateLibrary[Template Library]
-    MonacoEditor[Monaco Editor]
-    DOMPurify[DOMPurify]
-    Database[Database)]
-    Redis[缓存)]
+    TemplateLibrary[模板库<br>Template Library]
+    MonacoEditor[Monaco编辑器<br>Monaco Editor]
+    DOMPurify[HTML清理器<br>DOMPurify]
+    Database[(数据库<br>Database)]
+    Redis[(Redis<br>缓存)]
 
     User -->|浏览| BrowseTemplates
     User -->|选择| SelectTemplate
@@ -55,7 +55,7 @@ graph TB
     UnpublishPage -->|删除内容| Database
     UnpublishPage -->|清除缓存| Redis
 
-    ExportHTML -->|生成文件|ExportHTML
+    ExportHTML -->|生成文件| ExportHTML
 
     style User fill:#10B981,color:#fff
     style Visitor fill:#F59E0B,color:#fff
@@ -79,13 +79,15 @@ graph TB
 
 ### 预设模板分类
 
-| 类别 |模板名称 | 使用场景 |
+| 类别 | 模板名称 | 使用场景 |
 |------|----------|----------|
 | **产品介绍** | Product Showcase | 产品发布、功能展示 |
 | **活动推广** | Event Promotion | 校园活动、线下聚会 |
 | **表单收集** | Form Collection | 问卷调查、报名登记 |
 | **公告通知** | Announcement | 重要通知、系统维护 |
-| **倒计时** | Countdown Timer | 活动倒计时、限时优惠 |---
+| **倒计时** | Countdown Timer | 活动倒计时、限时优惠 |
+
+---
 
 ## 编辑模式
 
@@ -263,9 +265,9 @@ javascript:, data:, vbscript:
 
 ## 性能优化
 
-| 优化项 |实现方式 | 效果 |
+| 优化项 | 实现方式 | 效果 |
 |--------|----------|------|
-| **CDN 加载** |TailwindCSS 从 CDN 加载 | 减少服务器负担 |
-| **页面缓存** |Redis 缓存完整 HTML (24h) | 加载时间 < 100ms |
+| **CDN 加载** | TailwindCSS 从 CDN 加载 | 减少服务器负担 |
+| **页面缓存** | Redis 缓存完整 HTML (24h) | 加载时间 < 100ms |
 | **代码压缩** | Minify HTML/CSS | 文件大小减少 40% |
-| **图片优化** |WebP 格式 + 懒加载 | 加载速度提升 60% |
+| **图片优化** | WebP 格式 + 懒加载 | 加载速度提升 60% |
