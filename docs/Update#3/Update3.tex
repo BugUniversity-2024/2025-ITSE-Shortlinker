@@ -1,0 +1,110 @@
+\documentclass[11pt,a4paper]{article}
+
+% 包导入
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{geometry}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{titlesec}
+\usepackage{changepage}
+\usepackage{graphicx}
+
+% 页面设置
+\geometry{margin=1in}
+
+% 超链接设置
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    urlcolor=blue,
+    citecolor=blue
+}
+
+% 标题格式设置
+\titleformat{\section}{\Large\bfseries}{}{0em}{}
+\titleformat{\subsection}{\large\bfseries}{}{0em}{}
+
+% 文档信息
+\title{\textbf{CS Group 8 TinyBridge Process Update \#3}}
+\author{}
+\date{November 12, 2025}
+
+\begin{document}
+
+\maketitle
+
+\begin{center}
+\textbf{TinyBridge} - A Lightweight URL Shortening Service designed for Efficiency and Branding.
+\end{center}
+
+\vspace{1em}
+
+\section{Summary of Work Done to Date}
+
+\begin{adjustwidth}{1.5em}{}
+Since Update \#2, the team has successfully implemented core functionality and established the technical foundation:
+
+\subsection{1. Database Architecture Implementation ---- Completed}
+
+Fully implemented six core tables (User, Team, ShortLink, ClickLog, LandingPage, APIKey) with Prisma ORM. Applied index optimization for short URL lookups and click log queries, achieving sub-100ms query performance targets.
+
+\subsection{2. Core Functionality Development ---- Completed}
+
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Short Link Generation}: Base62 encoding with Bloom Filter collision detection, supporting custom aliases and expiration.
+
+    \item \textbf{User Authentication}: JWT tokens with Argon2 hashing, login rate limiting (5/hour), and session management.
+
+    \item \textbf{Redirection \& Caching}: Multi-tier Redis caching with 85\%+ cache hit rates and sub-50ms latency.
+\end{itemize}
+
+\subsection{3. Frontend Interface Development ---- Completed}
+
+Implemented responsive user interface with Vue 3 and TailwindCSS, featuring intuitive link management dashboard, real-time statistics display, and seamless user experience across devices.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.5\textwidth]{QQ20251112-195243.png}
+\caption{TinyBridge Frontend Interface}
+\end{figure}
+\end{adjustwidth}
+
+\section{Challenges Faced and Solutions}
+
+\begin{adjustwidth}{1.5em}{}
+\subsection{Challenge 1: Time Management Under Pressure}
+
+Multiple converging deadlines (TechReport Nov 20) created pressure to balance development, testing, and documentation simultaneously.
+
+\vspace{0.5em}
+\noindent\textbf{Solution}: Adopted agile MVP-first approach with daily stand-ups. Prioritized core features, optimized task assignment by team strengths, and synchronized parallel workstreams through frequent integration checkpoints.
+
+\subsection{Challenge 2: Test Coverage and Quality Assurance}
+
+Maintaining adequate test coverage while developing rapidly required balancing speed with quality assurance rigor.
+
+\vspace{0.5em}
+\noindent\textbf{Solution}: Established automated testing with CI/CD (GitHub Actions). Applied "critical path first" strategy for unit tests, implemented mandatory code reviews, and integrated automated linting/type checking.
+\end{adjustwidth}
+
+\section{Next Steps}
+
+\begin{adjustwidth}{1.5em}{}
+\begin{enumerate}[leftmargin=*]
+    \item \textbf{Complete Remaining Features}: Finalize QR code generation, click analytics dashboard, and batch operations API (target: Nov 16).
+
+    \item \textbf{System Testing \& Optimization}: Conduct load testing (5,000 req/s target), stress testing, and end-to-end integration testing. Profile and resolve performance bottlenecks.
+
+    \item \textbf{Prepare Technical Report \& Presentation}: Document system architecture, implementation decisions, and testing results. Develop demo scenarios and presentation materials for Nov 20 final presentation.
+\end{enumerate}
+\end{adjustwidth}
+
+\vspace{1em}
+
+\begin{flushright}
+\textbf{Date}: November 12, 2025 \\
+\textbf{Team}: CS Group 8
+\end{flushright}
+
+\end{document}
