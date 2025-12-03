@@ -4,6 +4,7 @@ import linksRoutes from './links.routes.js'
 import analyticsRoutes from './analytics.routes.js'
 import teamsRoutes from './teams.routes.js'
 import landingPagesRoutes from './landing-pages.routes.js'
+import apikeyRoutes from './apikey.routes.js'
 
 const router = Router()
 
@@ -22,5 +23,6 @@ router.use('/links', linksRoutes)
 router.use('/analytics', analyticsRoutes)
 router.use('/teams', teamsRoutes)
 router.use('/landing-pages', landingPagesRoutes)
+router.use('/api-keys', apikeyRoutes)
 
 export default router

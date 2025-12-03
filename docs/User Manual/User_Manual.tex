@@ -1,0 +1,544 @@
+\documentclass[12pt,a4paper]{article}
+
+% ==================== Package Imports ====================
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{geometry}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{titlesec}
+\usepackage{graphicx}
+\usepackage{longtable}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{xcolor}
+\usepackage{tocloft}
+\usepackage{fancyhdr}
+\usepackage{setspace}
+\usepackage{parskip}
+\usepackage{listings}
+\usepackage{times}
+
+% ==================== Page Setup ====================
+\geometry{
+    a4paper,
+    margin=1in,
+    top=1in,
+    bottom=1in
+}
+
+% Line spacing
+\onehalfspacing
+
+% ==================== 紧凑排版设置 ====================
+% 压缩列表间距
+\setlist{nosep, leftmargin=*, topsep=0pt, partopsep=0pt}
+\setlist[itemize]{itemsep=1pt, parsep=0pt}
+\setlist[enumerate]{itemsep=1pt, parsep=0pt}
+
+% 压缩段落间距
+\setlength{\parskip}{0.5em}
+
+% 压缩标题前后间距
+\titlespacing*{\section}{0pt}{1.5ex plus 0.5ex minus 0.2ex}{1ex plus 0.2ex}
+\titlespacing*{\subsection}{0pt}{1.2ex plus 0.4ex minus 0.2ex}{0.8ex plus 0.2ex}
+\titlespacing*{\subsubsection}{0pt}{1ex plus 0.3ex minus 0.1ex}{0.5ex plus 0.1ex}
+
+% 压缩图表前后间距
+\setlength{\floatsep}{8pt plus 2pt minus 2pt}
+\setlength{\textfloatsep}{10pt plus 2pt minus 2pt}
+\setlength{\intextsep}{8pt plus 2pt minus 2pt}
+
+% 压缩表格和图片标题间距
+\captionsetup{skip=4pt, belowskip=2pt}
+
+% 压缩目录间距
+\setlength{\cftbeforesecskip}{2pt}
+\setlength{\cftbeforesubsecskip}{1pt}
+
+% 目录只显示到二级标题
+\setcounter{tocdepth}{2}
+
+% ==================== Hyperlink Setup ====================
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    urlcolor=blue,
+    citecolor=blue,
+    bookmarks=true,
+    bookmarksopen=true
+}
+
+% ==================== Title Formats ====================
+\titleformat{\section}{\Large\bfseries}{\thesection}{1em}{}
+\titleformat{\subsection}{\large\bfseries}{\thesubsection}{1em}{}
+\titleformat{\subsubsection}{\normalsize\bfseries}{\thesubsubsection}{1em}{}
+
+% ==================== Header and Footer ====================
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{TinyBridge User Manual}
+\fancyhead[R]{CS Group 8}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0pt}
+
+% ==================== Code Listing Style ====================
+\lstset{
+    basicstyle=\ttfamily\small,
+    breaklines=true,
+    frame=single,
+    backgroundcolor=\color{gray!10},
+    keywordstyle=\color{blue},
+    commentstyle=\color{green!60!black},
+    stringstyle=\color{orange},
+    showstringspaces=false,
+    tabsize=2
+}
+
+% ==================== Document Begin ====================
+\begin{document}
+
+% ==================== Cover Page ====================
+\begin{titlepage}
+    \centering
+    \vspace*{2cm}
+
+    {\Huge\bfseries TinyBridge User Manual\par}
+    \vspace{1cm}
+    {\Large A Lightweight URL Shortening Service\par}
+    \vspace{0.5cm}
+    {\large Installation, Configuration, and Usage Guide\par}
+
+    \vspace{3cm}
+
+    {\Large\bfseries CS Group 8\par}
+    {\large Introduction to Software Engineering\par}
+
+    \vspace{2cm}
+
+    {\large December 2025\par}
+
+    \vfill
+
+\end{titlepage}
+
+% ==================== Table of Contents ====================
+\newpage
+{\singlespacing
+\tableofcontents}
+\newpage
+
+% ==================== Chapter 1: Introduction ====================
+\section{Introduction}
+
+\subsection{About TinyBridge}
+
+TinyBridge is a lightweight, efficient URL shortening service designed for campus organizations, small  enterprises and individual content creators. The platform transforms long, unwieldy URLs into concise, memorable short links while providing comprehensive analytics and customization features.
+
+\subsection{Key Features}
+
+TinyBridge offers the following core functionalities:
+
+\begin{itemize}
+    \item \textbf{URL Shortening}: Convert long URLs into short, shareable links using a 6-character alphanumeric code
+    \item \textbf{Custom Short Codes}: Create personalized short codes for better brand recognition
+    \item \textbf{Click Analytics}: Track click counts, geographic distribution, device types, and traffic sources
+    \item \textbf{QR Code Generation}: Automatically generate QR codes for each short link
+    \item \textbf{API Access}: Programmatic access via RESTful API with key-based authentication
+\end{itemize}
+
+\subsection{System Requirements}
+
+Before installing TinyBridge, ensure your system meets the following requirements:
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|l|}
+\hline
+\textbf{Component} & \textbf{Requirement} \\
+\hline
+Node.js & Version 20.19.0 or higher \\
+Yarn & Version 1.22.0 or higher \\
+Operating System & Windows 10+, macOS 10.15+, or Linux \\
+Disk Space & Minimum 500 MB \\
+RAM & Minimum 2 GB \\
+\hline
+\end{tabular}
+\caption{System Requirements}
+\end{table}
+
+% ==================== Chapter 2: Installation Guide ====================
+\section{Installation Guide}
+
+This chapter provides step-by-step instructions for installing and configuring TinyBridge on your local machine.
+
+\subsection{Prerequisites}
+
+\subsubsection{Installing Node.js}
+
+Download and install Node.js from the official website: \url{https://nodejs.org/}
+
+Verify the installation by running:
+\begin{lstlisting}[language=bash]
+node --version
+\end{lstlisting}
+
+\subsubsection{Installing Yarn}
+
+Install Yarn via corepack (bundled with Node.js 16.10+):
+\begin{lstlisting}[language=bash]
+corepack enable
+yarn --version
+\end{lstlisting}
+
+\subsection{Backend Installation}
+
+\subsubsection{Step 1: Clone the Repository}
+
+\begin{lstlisting}[language=bash]
+git clone https://github.com/BugUniversity-2024/2025-ITSE-Shortlinker.git
+cd 2025-ITSE-Shortlinker/Backend
+\end{lstlisting}
+
+\subsubsection{Step 2: Install Dependencies}
+
+\begin{lstlisting}[language=bash]
+yarn install
+\end{lstlisting}
+
+\subsubsection{Step 3: Configure Environment Variables}
+
+Create a \texttt{.env} file in the Backend directory:
+\begin{lstlisting}
+NODE_ENV=development
+PORT=8000
+DATABASE_URL="file:./dev.db"
+JWT_SECRET=your-secret-key-here
+JWT_EXPIRES_IN=24h
+CORS_ORIGINS=http://localhost:5173
+\end{lstlisting}
+
+\textbf{Important}: Replace \texttt{your-secret-key-here} with a secure random string for production use.
+
+\subsubsection{Step 4: Initialize the Database}
+
+\begin{lstlisting}[language=bash]
+yarn db:push
+\end{lstlisting}
+
+This command creates the SQLite database and initializes all required tables.
+
+\subsubsection{Step 5: Start the Backend Server}
+
+For development:
+\begin{lstlisting}[language=bash]
+yarn dev
+\end{lstlisting}
+
+The backend server will start at \texttt{http://localhost:8000}.
+
+\subsection{Frontend Installation}
+
+\subsubsection{Step 1: Navigate to Frontend Directory}
+
+\begin{lstlisting}[language=bash]
+cd ../Frontend
+\end{lstlisting}
+
+\subsubsection{Step 2: Install Dependencies}
+
+\begin{lstlisting}[language=bash]
+yarn install
+\end{lstlisting}
+
+\subsubsection{Step 3: Start the Development Server}
+
+\begin{lstlisting}[language=bash]
+yarn dev
+\end{lstlisting}
+
+The frontend application will be available at \texttt{http://localhost:5173}.
+
+\subsection{Verifying Installation}
+
+After starting both servers, open your browser and navigate to \texttt{http://localhost:5173}. You should see the TinyBridge login page as shown in Figure~\ref{fig:login}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{image/Screenshot_27-11-2025_5394_localhost.jpeg}
+    \caption{TinyBridge Login Page}
+    \label{fig:login}
+\end{figure}
+
+% ==================== Chapter 3: Quick Start Guide ====================
+\section{Quick Start Guide}
+
+\subsection{Step 1: Create an Account}
+
+\begin{enumerate}
+    \item Open TinyBridge in  \texttt{http://localhost:5173}
+    \item Click ``Register now'' on the login page
+    \item Fill in the registration form:
+    \begin{itemize}
+        \item Username (3-20 characters)
+        \item Email address
+        \item Password (minimum 8 characters)
+    \end{itemize}
+    \item Click ``Create Account''
+\end{enumerate}
+
+\subsection{Step 2: Log In}
+
+\begin{enumerate}
+    \item Enter your email address and password. Click ``Sign In''. 
+\end{enumerate}
+
+\subsection{Step 3: Create Your First Short Link}
+
+\begin{enumerate}
+    \item Click ``Create Link''. Enter the original URL you want to shorten
+    \item (Optional) Customize the short code, add a description or set an expiration time
+    \item Click ``Generate Short Link''.Copy the generated short link to share
+\end{enumerate}
+
+\subsection{Step 4: Test the Short Link}
+
+Open a new browser tab and paste your short link. You should be redirected to the original URL.
+
+% ==================== Chapter 4: Feature Guide ====================
+\section{Feature Guide}
+
+\subsection{Dashboard Overview}
+
+The Dashboard provides a quick overview of your account activity.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{image/Screenshot_27-11-2025_54850_localhost.jpeg}
+    \caption{TinyBridge Dashboard}
+    \label{fig:dashboard}
+\end{figure}
+
+The Dashboard displays:
+\begin{itemize}
+    \item \textbf{Total Links}: Number of short links you have created
+    \item \textbf{Total Clicks}: Cumulative clicks across all your links
+    \item \textbf{Today Clicks}: Clicks received today
+    \item \textbf{Click Trends}: Visualization of recent click activity
+    \item \textbf{Quick Actions}: Shortcuts to create links, batch create or view analytics
+\end{itemize}
+
+\subsection{Creating Short Links}
+
+Navigate to ``Create Link'' in the sidebar to access the link creation interface.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{image/Screenshot_27-11-2025_55112_localhost.jpeg}
+    \caption{Create Short Link Interface}
+    \label{fig:create}
+\end{figure}
+
+\subsubsection{Required Fields}
+\begin{itemize}
+    \item \textbf{Original URL}: The full URL you want to shorten (must be a valid URL starting with http:// or https://)
+\end{itemize}
+
+\subsubsection{Optional Fields}
+\begin{itemize}
+    \item \textbf{Custom Short Code}: Create a memorable code (4-20 characters, alphanumeric with hyphens and underscores)
+    \item \textbf{Description}: Add a note to help you remember what this link is for
+\end{itemize}
+
+\subsection{Managing Links}
+
+It displays all your short links in a searchable, sortable table.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{image/Screenshot_27-11-2025_55153_localhost.jpeg}
+    \caption{Link Management Interface}
+    \label{fig:manage}
+\end{figure}
+
+\subsubsection{Available Actions}
+\begin{itemize}
+    \item \textbf{Copy}: Copy the short link to clipboard
+    \item \textbf{View Analytics}: See detailed statistics for this link
+    \item \textbf{Edit}: Modify the link's description, tags, or expiration
+    \item \textbf{Enable/Disable}: Toggle the link's active status
+    \item \textbf{Delete}: Permanently remove the link
+\end{itemize}
+
+\subsubsection{Link Status}
+\begin{itemize}
+    \item \textbf{Active} (green): Link is working and redirecting
+    \item \textbf{Disabled} (red): Link has been manually disabled
+    \item \textbf{Expired}: Link has passed its expiration date
+\end{itemize}
+
+\subsection{Analytics Dashboard}
+
+The Analytics page provides detailed insights into your link performance.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{image/Screenshot_27-11-2025_55216_localhost.jpeg}
+    \caption{Analytics Dashboard}
+    \label{fig:analytics}
+\end{figure}
+
+\subsubsection{Visualizations}
+\begin{itemize}
+    \item \textbf{Click Trends}: Line chart showing clicks over time
+    \item \textbf{Traffic Sources}: Breakdown of direct visits, search engines and referrers
+    \item \textbf{Total Clicks}: All clicks on the selected link
+    \item \textbf{Peak Hour/Day}: The hour/date with most clicks
+\end{itemize}
+
+\subsubsection{Exporting Data}
+Click ``Export Data'' to download analytics data in CSV format for further analysis.
+
+\subsection{API Key Management}
+
+For programmatic access, TinyBridge provides API key management.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{image/Screenshot_27-11-2025_5532_localhost.jpeg}
+    \caption{API Key Management}
+    \label{fig:apikeys}
+\end{figure}
+
+\subsubsection{Creating an API Key}
+\begin{enumerate}
+    \item Click ``Create New Key''
+    \item Enter a name for the key (e.g., ``Production'', ``Testing'')
+    \item Select permissions: \texttt{links:read}, \texttt{links:write}, \texttt{links:delete}, \texttt{analytics:read}
+    \item Set rate limits and expiration (optional)
+    \item Click ``Create''
+    \item \textbf{Important}: Copy the key immediately as it won't be shown again
+\end{enumerate}
+
+\subsubsection{Using the API}
+Include the API key in the Authorization header:
+\begin{lstlisting}
+curl -X POST https://api.tinybridge.link/v1/links \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"url": "https://example.com"}'
+\end{lstlisting}
+
+\subsection{Profile Management}
+
+Manage your account settings in the Profile section.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{image/Screenshot_27-11-2025_5542_localhost.jpeg}
+    \caption{Profile Settings}
+    \label{fig:profile}
+\end{figure}
+
+\subsubsection{Basic Information}
+\begin{itemize}
+    \item Update your username
+    \item Update phone number
+\end{itemize}
+
+\subsubsection{Preferences}
+\begin{itemize}
+    \item Enable/disable email notifications
+    \item Toggle public profile visibility
+    \item Control analytics sharing
+\end{itemize}
+
+\subsubsection{Password Security}
+\begin{itemize}
+    \item Change your password by entering current and new passwords
+    \item Passwords must be at least 8 characters
+\end{itemize}
+
+\subsection{Landing Page Editor}
+
+Create custom landing pages for your short links.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{image/Screenshot_27-11-2025_6410_localhost.jpeg}
+    \caption{Landing Page Editor}
+    \label{fig:landing}
+\end{figure}
+
+\subsubsection{Using Templates}
+\begin{enumerate}
+    \item Select a link to customize
+    \item Choose from available templates
+    \item Preview in desktop, tablet or mobile view
+\end{enumerate}
+
+\subsubsection{Customization Options}
+\begin{itemize}
+    \item \textbf{Template}: Choose from pre-designed layouts
+    \item \textbf{Content}: Edit text and messages
+    \item \textbf{Style}: Customize colors and fonts
+    \item \textbf{Options}: Configure redirect delay and behavior
+\end{itemize}
+
+% ==================== Chapter 5: Frequently Asked Questions ====================
+\section{Frequently Asked Questions (FAQs)}
+
+\noindent\textbf{\underline{Q1: What is TinyBridge?}}\\
+A1: TinyBridge is a lightweight URL shortening service that transforms long URLs into short, memorable links with analytics and API access.
+
+\noindent\textbf{\underline{Q2: Is TinyBridge free to use?}}\\
+A2: Yes, TinyBridge is completely free. All features including link creation, analytics, and API access are available at no cost.
+
+\noindent\textbf{\underline{Q3: How do I create a short link?}}\\
+A3: Navigate to ``Create Link'', enter your URL, optionally customize the short code, and click ``Generate Short Link''.
+
+\noindent\textbf{\underline{Q4: Can I customize my short links?}}\\
+A4: Yes, you can create custom short codes (4-20 characters, alphanumeric with hyphens and underscores).
+
+\noindent\textbf{\underline{Q5: How do I track link performance?}}\\
+A5: Visit the ``Analytics'' page to view click counts, geographic distribution, device types, and traffic sources.
+
+\noindent\textbf{\underline{Q6: Is my data secure?}}\\
+A6: Yes. All passwords are encrypted using industry-standard algorithms, and user data is only accessible to the account owner.
+
+\noindent\textbf{\underline{Q7: How do I use the API?}}\\
+A7: Generate an API key from ``API Keys'' page, then use the header: \texttt{Authorization: Bearer YOUR\_API\_KEY}.
+
+\noindent\textbf{\underline{Q8: What browsers are supported?}}\\
+A8: Chrome, Firefox, Safari, and Edge. We recommend using the latest version for optimal performance.
+
+% ==================== Chapter 6: Troubleshooting ====================
+\section{Troubleshooting}
+
+\noindent\textbf{\underline{1. Unable to register or log in}}\\
+Verify that email is valid and not already registered, password meets requirements (8+ chars), and network is stable. Try clearing browser cache if issues persist.
+
+\noindent\textbf{\underline{2. Short link not redirecting}}\\
+Check that the link has not been disabled/deleted, has not expired, and the original URL is still accessible.
+
+\noindent\textbf{\underline{3. Analytics data not showing}}\\
+Analytics may take a few minutes to update. Ensure you're viewing the correct link and that it has received clicks.
+
+\noindent\textbf{\underline{4. API requests returning errors}}\\
+Verify your API key is valid, has appropriate permissions, and request format matches the documentation.
+
+\noindent\textbf{\underline{5. Page loading slowly}}\\
+Check internet connection, clear browser cache, try a different browser, and ensure JavaScript is enabled.
+
+\noindent\textbf{Getting Help:} Check the project repository or contact \texttt{support@tinybridge.link}.
+
+\vfill
+\begin{center}
+\textit{--- End of User Manual ---}
+\end{center}
+
+\end{document}

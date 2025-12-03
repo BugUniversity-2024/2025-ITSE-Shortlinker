@@ -1,13 +1,22 @@
-export function formatDate(date: string | Date, format: 'short' | 'long' | 'relative' = 'short'): string {
+export function formatDate(date: string | Date, format: 'short' | 'long' | 'relative' | 'datetime' = 'short'): string {
   const d = typeof date === 'string' ? new Date(date) : date
 
   if (format === 'relative') {
     return formatRelativeTime(d)
   }
 
-  const options: Intl.DateTimeFormatOptions = format === 'long'
-    ? { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' }
-    : { year: 'numeric', month: '2-digit', day: '2-digit' }
+  let options: Intl.DateTimeFormatOptions
+
+  switch (format) {
+    case 'long':
+      options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' }
+      break
+    case 'datetime':
+      options = { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }
+      break
+    default:
+      options = { year: 'numeric', month: '2-digit', day: '2-digit' }
+  }
 
   return d.toLocaleDateString('en-US', options)
 }

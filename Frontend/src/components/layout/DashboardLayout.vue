@@ -127,7 +127,8 @@ import {
   ChartBarIcon,
   UserIcon,
   ListBulletIcon,
-  UserGroupIcon
+  UserGroupIcon,
+  KeyIcon
 } from '@heroicons/vue/24/outline'
 
 const router = useRouter()
@@ -138,10 +139,10 @@ const sidebarOpen = ref(false)
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: HomeIcon, label: 'Dashboard' },
-  { name: 'LinkList', href: '/dashboard/links', icon: ListBulletIcon, label: 'Link Management' },
+  { name: 'LinkList', href: '/dashboard/links', icon: ListBulletIcon, label: 'Manage Links' },
   { name: 'LinkGenerator', href: '/generator', icon: PlusIcon, label: 'Create Link' },
   { name: 'Analytics', href: '/dashboard/analytics', icon: ChartBarIcon, label: 'Analytics' },
-  { name: 'Teams', href: '/dashboard/teams', icon: UserGroupIcon, label: 'Teams' },
+  { name: 'ApiKeys', href: '/dashboard/api-keys', icon: KeyIcon, label: 'API Keys' },
   { name: 'Profile', href: '/profile', icon: UserIcon, label: 'Profile' }
 ]
 

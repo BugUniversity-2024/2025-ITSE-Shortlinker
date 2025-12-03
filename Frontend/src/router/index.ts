@@ -13,6 +13,7 @@ import AnalyticsPage from '@/views/analytics/AnalyticsPage.vue'
 import ProfilePage from '@/views/settings/ProfilePage.vue'
 import TeamListPage from '@/views/teams/TeamListPage.vue'
 import LandingPageEditor from '@/views/landing-pages/LandingPageEditor.vue'
+import ApiKeysPage from '@/views/api-keys/ApiKeysPage.vue'
 
 const routes: RouteRecordRaw[] = [
   // 公开页面
@@ -58,6 +59,12 @@ const routes: RouteRecordRaw[] = [
     path: '/dashboard/teams',
     name: 'Teams',
     component: TeamListPage,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/dashboard/api-keys',
+    name: 'ApiKeys',
+    component: ApiKeysPage,
     meta: { requiresAuth: true }
   },
   {
