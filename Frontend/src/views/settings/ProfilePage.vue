@@ -378,7 +378,7 @@ const registeredDate = computed(() => {
 
 async function fetchStats() {
   try {
-    const data = await authService.getStats()
+    const data = await authService.getUserStats()
     stats.total_links = data.total_links
     stats.active_links = data.active_links
     stats.total_clicks = data.total_clicks

@@ -1,0 +1,24 @@
+{
+  "name": "tinybridge",
+  "version": "1.0.0",
+  "main": "start.cjs",
+  "bin": "start.cjs",
+  "pkg": {
+    "scripts": [
+      "start.cjs",
+      "server.cjs"
+    ],
+    "assets": [
+      "public/**/*",
+      "prisma/**/*",
+      ".env",
+      "data.db",
+      "node_modules/@prisma/client/**/*",
+      "node_modules/.prisma/**/*"
+    ],
+    "targets": [
+      "node18-win-x64"
+    ],
+    "outputPath": "executable"
+  }
+}

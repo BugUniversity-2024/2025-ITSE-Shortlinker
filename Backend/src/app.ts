@@ -3,6 +3,9 @@ import cors from 'cors'
 import helmet from 'helmet'
 import morgan from 'morgan'
 import QRCode from 'qrcode'
+import path from 'path'
+import { fileURLToPath } from 'url'
+import fs from 'fs'
 import { config } from './config/index.js'
 import { errorHandler, notFoundHandler } from './middlewares/errorHandler.js'
 import routes from './routes/index.js'
@@ -10,10 +13,61 @@ import prisma from './config/database.js'
 import { parseUserAgent } from './utils/userAgent.js'
 import crypto from 'crypto'
 
+// 兼容 ESM 和 CJS 的 __dirname
+function getCurrentDir(): string {
+  try {
+    // ESM 环境
+    if (typeof import.meta !== 'undefined' && import.meta.url) {
+      return path.dirname(fileURLToPath(import.meta.url))
+    }
+  } catch {
+    // ignore
+  }
+  // CJS 或打包环境
+  return process.cwd()
+}
+const currentDir = getCurrentDir()
+
 const app = express()
 
-// 安全中间件
-app.use(helmet())
+// 前端路由白名单（这些路径应该由前端处理，而不是短链接重定向）
+const FRONTEND_ROUTES = [
+  '/',
+  '/login',
+  '/register',
+  '/dashboard',
+  '/generator',
+  '/profile',
+  '/links',
+]
+
+// 前端路由前缀（以这些开头的路径由前端处理）
+const FRONTEND_PREFIXES = [
+  '/dashboard/',
+  '/links/',
+  '/assets/',
+]
+
+// 判断是否是前端路由
+function isFrontendRoute(urlPath: string): boolean {
+  // 精确匹配
+  if (FRONTEND_ROUTES.includes(urlPath)) {
+    return true
+  }
+  // 前缀匹配
+  for (const prefix of FRONTEND_PREFIXES) {
+    if (urlPath.startsWith(prefix)) {
+      return true
+    }
+  }
+  return false
+}
+
+// 安全中间件（为静态文件服务放宽 CSP）
+app.use(helmet({
+  contentSecurityPolicy: false,
+  crossOriginEmbedderPolicy: false,
+}))
 
 // CORS
 app.use(cors({
@@ -132,14 +186,65 @@ app.post('/api/redirect/:shortCode/click', async (req, res) => {
 // API 路由
 app.use('/api', routes)
 
-// 短链接重定向 (放在最后，避免匹配其他路由)
-app.get('/:shortCode', async (req, res) => {
-  try {
-    const { shortCode } = req.params
+// 静态文件目录（打包后前端文件会放在这里）
+const publicDir = path.join(currentDir, 'public')
+const indexHtmlPath = path.join(publicDir, 'index.html')
 
-    // 排除已知路径
-    if (['api', 'health', 'qr', 'favicon.ico'].includes(shortCode)) {
-      res.status(404).json({ detail: '路径不存在' })
+// 检查是否存在前端构建产物
+const hasFrontend = fs.existsSync(indexHtmlPath)
+
+if (hasFrontend) {
+  console.log('📦 Serving frontend from:', publicDir)
+  // 静态文件服务
+  app.use(express.static(publicDir))
+}
+
+// 短链接重定向 + SPA fallback（放在最后）
+app.get('*', async (req, res, next) => {
+  try {
+    const urlPath = req.path
+
+    // 排除 API 和已知路径
+    if (urlPath.startsWith('/api') || urlPath === '/health' || urlPath.startsWith('/qr/')) {
+      next()
+      return
+    }
+
+    // 如果是前端路由，返回 index.html
+    if (isFrontendRoute(urlPath)) {
+      if (hasFrontend) {
+        res.sendFile(indexHtmlPath)
+      } else {
+        res.status(404).json({ detail: '前端未构建' })
+      }
+      return
+    }
+
+    // 检查是否是静态资源文件（有扩展名的）
+    const ext = path.extname(urlPath)
+    if (ext && ext !== '.html') {
+      // 静态资源不存在，404
+      if (hasFrontend) {
+        const filePath = path.join(publicDir, urlPath)
+        if (fs.existsSync(filePath)) {
+          res.sendFile(filePath)
+          return
+        }
+      }
+      res.status(404).json({ detail: '资源不存在' })
+      return
+    }
+
+    // 尝试短链接重定向
+    const shortCode = urlPath.slice(1) // 去掉开头的 /
+
+    // 验证 shortCode 格式（只允许字母数字）
+    if (!/^[a-zA-Z0-9_-]+$/.test(shortCode)) {
+      if (hasFrontend) {
+        res.sendFile(indexHtmlPath)
+      } else {
+        res.status(404).json({ detail: '路径不存在' })
+      }
       return
     }
 
@@ -148,7 +253,12 @@ app.get('/:shortCode', async (req, res) => {
     })
 
     if (!link) {
-      res.status(404).json({ detail: '链接不存在' })
+      // 短链接不存在，尝试返回前端页面
+      if (hasFrontend) {
+        res.sendFile(indexHtmlPath)
+      } else {
+        res.status(404).json({ detail: '链接不存在' })
+      }
       return
     }
 
