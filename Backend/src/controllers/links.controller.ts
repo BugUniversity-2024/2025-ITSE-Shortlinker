@@ -102,7 +102,7 @@ export async function deleteLink(
   try {
     const linkId = parseInt(req.params.id, 10)
     await linksService.deleteLink(req.user!.id, linkId)
-    res.json({ message: '链接已删除' })
+    res.json({ message: 'Link deleted' })
   } catch (error) {
     next(error)
   }

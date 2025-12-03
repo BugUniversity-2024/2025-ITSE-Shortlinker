@@ -1,8 +1,8 @@
 import { z } from 'zod'
 
 export const createLinkSchema = z.object({
-  original_url: z.string().url('请输入有效的 URL'),
-  short_code: z.string().min(3).max(20).regex(/^[a-zA-Z0-9_-]+$/, '短码只能包含字母、数字、下划线和连字符').optional(),
+  original_url: z.string().url('Please enter a valid URL'),
+  short_code: z.string().min(3).max(20).regex(/^[a-zA-Z0-9_-]+$/, 'Short code can only contain letters, numbers, underscores and hyphens').optional(),
   title: z.string().max(200).optional(),
   description: z.string().max(500).optional(),
   tags: z.string().max(500).optional(),

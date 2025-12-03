@@ -109,7 +109,7 @@ app.get('/qr/:shortCode', async (req, res) => {
     res.setHeader('Cache-Control', 'public, max-age=86400')
     res.send(qrBuffer)
   } catch {
-    res.status(500).json({ detail: 'QR 码生成失败' })
+    res.status(500).json({ detail: 'QR code generation failed' })
   }
 })
 
@@ -122,23 +122,23 @@ app.get('/api/redirect/:shortCode', async (req, res) => {
     })
 
     if (!link) {
-      res.status(404).json({ detail: '链接不存在' })
+      res.status(404).json({ detail: 'Link not found' })
       return
     }
 
     if (!link.isActive) {
-      res.status(410).json({ detail: '链接已禁用' })
+      res.status(410).json({ detail: 'Link is disabled' })
       return
     }
 
     if (link.expiresAt && link.expiresAt < new Date()) {
-      res.status(410).json({ detail: '链接已过期' })
+      res.status(410).json({ detail: 'Link has expired' })
       return
     }
 
     res.json({ original_url: link.originalUrl })
   } catch {
-    res.status(500).json({ detail: '服务器错误' })
+    res.status(500).json({ detail: 'Server error' })
   }
 })
 
@@ -150,7 +150,7 @@ app.post('/api/redirect/:shortCode/click', async (req, res) => {
     })
 
     if (!link) {
-      res.status(404).json({ detail: '链接不存在' })
+      res.status(404).json({ detail: 'Link not found' })
       return
     }
 
@@ -179,7 +179,7 @@ app.post('/api/redirect/:shortCode/click', async (req, res) => {
 
     res.json({ message: 'ok' })
   } catch {
-    res.status(500).json({ detail: '服务器错误' })
+    res.status(500).json({ detail: 'Server error' })
   }
 })
 
@@ -200,7 +200,8 @@ if (hasFrontend) {
 }
 
 // 短链接重定向 + SPA fallback（放在最后）
-app.get('*', async (req, res, next) => {
+// Express 5.x 需要使用正则表达式或命名参数代替 '*'
+app.get(/^\/(.*)$/, async (req, res, next) => {
   try {
     const urlPath = req.path
 
@@ -215,15 +216,15 @@ app.get('*', async (req, res, next) => {
       if (hasFrontend) {
         res.sendFile(indexHtmlPath)
       } else {
-        res.status(404).json({ detail: '前端未构建' })
+        res.status(404).json({ detail: 'Frontend not built' })
       }
       return
     }
 
-    // 检查是否是静态资源文件（有扩展名的）
+    // Check if it's a static asset file (has extension)
     const ext = path.extname(urlPath)
     if (ext && ext !== '.html') {
-      // 静态资源不存在，404
+      // Static asset not found, 404
       if (hasFrontend) {
         const filePath = path.join(publicDir, urlPath)
         if (fs.existsSync(filePath)) {
@@ -231,19 +232,19 @@ app.get('*', async (req, res, next) => {
           return
         }
       }
-      res.status(404).json({ detail: '资源不存在' })
+      res.status(404).json({ detail: 'Resource not found' })
       return
     }
 
-    // 尝试短链接重定向
-    const shortCode = urlPath.slice(1) // 去掉开头的 /
+    // Try short link redirect
+    const shortCode = urlPath.slice(1) // Remove leading /
 
-    // 验证 shortCode 格式（只允许字母数字）
+    // Validate shortCode format (only alphanumeric)
     if (!/^[a-zA-Z0-9_-]+$/.test(shortCode)) {
       if (hasFrontend) {
         res.sendFile(indexHtmlPath)
       } else {
-        res.status(404).json({ detail: '路径不存在' })
+        res.status(404).json({ detail: 'Path not found' })
       }
       return
     }
@@ -253,22 +254,22 @@ app.get('*', async (req, res, next) => {
     })
 
     if (!link) {
-      // 短链接不存在，尝试返回前端页面
+      // Short link not found, try to return frontend page
       if (hasFrontend) {
         res.sendFile(indexHtmlPath)
       } else {
-        res.status(404).json({ detail: '链接不存在' })
+        res.status(404).json({ detail: 'Link not found' })
       }
       return
     }
 
     if (!link.isActive) {
-      res.status(410).json({ detail: '链接已禁用' })
+      res.status(410).json({ detail: 'Link is disabled' })
       return
     }
 
     if (link.expiresAt && link.expiresAt < new Date()) {
-      res.status(410).json({ detail: '链接已过期' })
+      res.status(410).json({ detail: 'Link has expired' })
       return
     }
 
@@ -297,10 +298,10 @@ app.get('*', async (req, res, next) => {
       }),
     ]).catch(console.error)
 
-    // 302 重定向
+    // 302 redirect
     res.redirect(302, link.originalUrl)
   } catch {
-    res.status(500).json({ detail: '服务器错误' })
+    res.status(500).json({ detail: 'Server error' })
   }
 })
 

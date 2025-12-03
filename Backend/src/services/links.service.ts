@@ -9,13 +9,13 @@ export async function createLink(userId: number, data: CreateLinkInput) {
 
   if (shortCode) {
     if (!isValidShortCode(shortCode)) {
-      throw new AppError('短码格式无效', 400)
+      throw new AppError('Invalid short code format', 400)
     }
     const existing = await prisma.shortLink.findUnique({
       where: { shortCode },
     })
     if (existing) {
-      throw new AppError('短码已被使用', 409)
+      throw new AppError('Short code already in use', 409)
     }
   } else {
     // 生成唯一短码
@@ -30,7 +30,7 @@ export async function createLink(userId: number, data: CreateLinkInput) {
     } while (attempts < 10)
 
     if (attempts >= 10) {
-      throw new AppError('无法生成唯一短码，请稍后重试', 500)
+      throw new AppError('Unable to generate unique short code, please try again later', 500)
     }
   }
 
@@ -60,7 +60,7 @@ export async function batchCreate(userId: number, urls: string[]) {
     } catch (error) {
       failed.push({
         url,
-        error: error instanceof Error ? error.message : '创建失败',
+        error: error instanceof Error ? error.message : 'Creation failed',
       })
     }
   }
@@ -112,7 +112,7 @@ export async function getLinkById(userId: number, linkId: number) {
   })
 
   if (!link) {
-    throw new AppError('链接不存在', 404)
+    throw new AppError('Link not found', 404)
   }
 
   return formatLink(link)
@@ -124,7 +124,7 @@ export async function getLinkByShortCode(shortCode: string) {
   })
 
   if (!link) {
-    throw new AppError('链接不存在', 404)
+    throw new AppError('Link not found', 404)
   }
 
   return formatLink(link)
@@ -136,7 +136,7 @@ export async function updateLink(userId: number, linkId: number, data: UpdateLin
   })
 
   if (!existing) {
-    throw new AppError('链接不存在', 404)
+    throw new AppError('Link not found', 404)
   }
 
   const link = await prisma.shortLink.update({
@@ -159,7 +159,7 @@ export async function deleteLink(userId: number, linkId: number) {
   })
 
   if (!existing) {
-    throw new AppError('链接不存在', 404)
+    throw new AppError('Link not found', 404)
   }
 
   await prisma.shortLink.delete({
@@ -173,7 +173,7 @@ export async function toggleStatus(userId: number, linkId: number) {
   })
 
   if (!existing) {
-    throw new AppError('链接不存在', 404)
+    throw new AppError('Link not found', 404)
   }
 
   const link = await prisma.shortLink.update({

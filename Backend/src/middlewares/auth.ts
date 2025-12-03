@@ -26,7 +26,7 @@ export async function authenticate(
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       res.status(401).json({
         success: false,
-        error: '未提供认证令牌',
+        error: 'Authentication token not provided',
       })
       return
     }
@@ -39,12 +39,12 @@ export async function authenticate(
     } catch {
       res.status(401).json({
         success: false,
-        error: '认证令牌无效或已过期',
+        error: 'Invalid or expired authentication token',
       })
       return
     }
 
-    // 查询用户
+    // Query user
     const user = await prisma.user.findUnique({
       where: { id: payload.userId },
       select: { id: true, username: true, email: true, isActive: true },
@@ -53,7 +53,7 @@ export async function authenticate(
     if (!user || !user.isActive) {
       res.status(401).json({
         success: false,
-        error: '用户不存在或已被禁用',
+        error: 'User not found or has been disabled',
       })
       return
     }

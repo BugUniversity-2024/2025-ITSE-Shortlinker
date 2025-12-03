@@ -30,31 +30,31 @@ export function errorHandler(
     return
   }
 
-  // Prisma 错误处理
+  // Prisma error handling
   if (err.name === 'PrismaClientKnownRequestError') {
     const prismaError = err as { code?: string }
     if (prismaError.code === 'P2002') {
       res.status(409).json({
-        detail: '数据已存在',
+        detail: 'Data already exists',
       })
       return
     }
     if (prismaError.code === 'P2025') {
       res.status(404).json({
-        detail: '记录不存在',
+        detail: 'Record not found',
       })
       return
     }
   }
 
-  // 其他错误
+  // Other errors
   res.status(500).json({
-    detail: config.isDev ? err.message : '服务器内部错误',
+    detail: config.isDev ? err.message : 'Internal server error',
   })
 }
 
 export function notFoundHandler(_req: Request, res: Response): void {
   res.status(404).json({
-    detail: '接口不存在',
+    detail: 'API endpoint not found',
   })
 }

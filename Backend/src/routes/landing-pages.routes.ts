@@ -9,8 +9,8 @@ const router = Router()
 const templates = [
   {
     id: 1,
-    name: '渐变欢迎页',
-    description: '带有渐变背景的现代欢迎页面',
+    name: 'Gradient Welcome',
+    description: 'Modern welcome page with gradient background',
     thumbnail: '',
     html_content: `<!DOCTYPE html>
 <html>
@@ -66,8 +66,8 @@ p {
   },
   {
     id: 2,
-    name: '产品展示',
-    description: '适合产品推广的卡片式布局',
+    name: 'Product Showcase',
+    description: 'Card-style layout for product promotion',
     thumbnail: '',
     html_content: `<!DOCTYPE html>
 <html>
@@ -164,8 +164,8 @@ p {
   },
   {
     id: 3,
-    name: '链接集合',
-    description: '社交媒体链接聚合页面',
+    name: 'Link Collection',
+    description: 'Social media link aggregation page',
     thumbnail: '',
     html_content: `<!DOCTYPE html>
 <html>
@@ -249,8 +249,8 @@ p {
   },
   {
     id: 4,
-    name: '活动倒计时',
-    description: '带倒计时的活动预告页',
+    name: 'Event Countdown',
+    description: 'Event announcement page with countdown timer',
     thumbnail: '',
     html_content: `<!DOCTYPE html>
 <html>
@@ -371,8 +371,8 @@ p {
   },
   {
     id: 5,
-    name: '简约名片',
-    description: '极简风格的个人名片页',
+    name: 'Minimal Card',
+    description: 'Minimalist personal business card page',
     thumbnail: '',
     html_content: `<!DOCTYPE html>
 <html>
@@ -469,8 +469,8 @@ h1 {
   },
   {
     id: 6,
-    name: '应用下载',
-    description: '移动应用推广下载页',
+    name: 'App Download',
+    description: 'Mobile app promotion download page',
     thumbnail: '',
     html_content: `<!DOCTYPE html>
 <html>
@@ -627,18 +627,18 @@ router.post('/preview', authenticate, (req: Request, res: Response) => {
   const { html_content, css_content } = req.body
 
   if (!html_content) {
-    res.status(400).json({ detail: '缺少 HTML 内容' })
+    res.status(400).json({ detail: 'Missing HTML content' })
     return
   }
 
-  // 生成完整的预览 HTML
+  // Generate complete preview HTML
   const previewHtml = `
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>落地页预览</title>
+  <title>Landing Page Preview</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
@@ -667,7 +667,7 @@ router.get('/:linkId', authenticate, async (req: Request, res: Response, next: N
     })
 
     if (!landingPage) {
-      res.status(404).json({ detail: '落地页不存在' })
+      res.status(404).json({ detail: 'Landing page not found' })
       return
     }
 
@@ -697,7 +697,7 @@ router.put('/:linkId', authenticate, async (req: Request, res: Response, next: N
       where: { id: linkId, userId: req.user!.id },
     })
     if (!link) {
-      res.status(404).json({ detail: '链接不存在' })
+      res.status(404).json({ detail: 'Link not found' })
       return
     }
 
@@ -739,7 +739,7 @@ router.delete('/:linkId', authenticate, async (req: Request, res: Response, next
       where: { linkId },
     })
 
-    res.json({ message: '落地页已删除' })
+    res.json({ message: 'Landing page deleted' })
   } catch (error) {
     next(error)
   }

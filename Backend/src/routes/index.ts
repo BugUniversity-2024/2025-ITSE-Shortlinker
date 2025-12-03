@@ -13,7 +13,7 @@ router.get('/', (_req, res) => {
   res.json({
     name: 'TinyBridge API',
     version: '1.0.0',
-    description: '短链接服务 API',
+    description: 'URL Shortener Service API',
   })
 })
 

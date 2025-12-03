@@ -43,15 +43,15 @@ export async function register(data: RegisterInput) {
     where: { username: data.username },
   })
   if (existingUsername) {
-    throw new AppError('用户名已被使用', 409)
+    throw new AppError('Username already taken', 409)
   }
 
-  // 检查邮箱是否已存在
+  // Check if email already exists
   const existingEmail = await prisma.user.findUnique({
     where: { email: data.email },
   })
   if (existingEmail) {
-    throw new AppError('邮箱已被注册', 409)
+    throw new AppError('Email already registered', 409)
   }
 
   // 创建用户
@@ -95,16 +95,16 @@ export async function login(data: LoginInput) {
   })
 
   if (!user) {
-    throw new AppError('用户名或密码错误', 401)
+    throw new AppError('Invalid username or password', 401)
   }
 
   if (!user.isActive) {
-    throw new AppError('账户已被禁用', 403)
+    throw new AppError('Account has been disabled', 403)
   }
 
   const isValidPassword = await comparePassword(data.password, user.passwordHash)
   if (!isValidPassword) {
-    throw new AppError('用户名或密码错误', 401)
+    throw new AppError('Invalid username or password', 401)
   }
 
   const token = generateToken({
@@ -135,7 +135,7 @@ export async function getProfile(userId: number) {
   })
 
   if (!user) {
-    throw new AppError('用户不存在', 404)
+    throw new AppError('User not found', 404)
   }
 
   return formatUser(user)
@@ -171,12 +171,12 @@ export async function changePassword(userId: number, data: ChangePasswordInput) 
   })
 
   if (!user) {
-    throw new AppError('用户不存在', 404)
+    throw new AppError('User not found', 404)
   }
 
   const isValidPassword = await comparePassword(data.current_password, user.passwordHash)
   if (!isValidPassword) {
-    throw new AppError('当前密码错误', 400)
+    throw new AppError('Current password is incorrect', 400)
   }
 
   const newPasswordHash = await hashPassword(data.new_password)
@@ -250,12 +250,12 @@ export async function deleteAccount(userId: number, password: string) {
   })
 
   if (!user) {
-    throw new AppError('用户不存在', 404)
+    throw new AppError('User not found', 404)
   }
 
   const isValidPassword = await comparePassword(password, user.passwordHash)
   if (!isValidPassword) {
-    throw new AppError('密码错误', 400)
+    throw new AppError('Incorrect password', 400)
   }
 
   // 级联删除会处理相关数据
@@ -301,11 +301,11 @@ export async function refreshToken(userId: number) {
   })
 
   if (!user) {
-    throw new AppError('用户不存在', 404)
+    throw new AppError('User not found', 404)
   }
 
   if (!user.isActive) {
-    throw new AppError('账户已被禁用', 403)
+    throw new AppError('Account has been disabled', 403)
   }
 
   const token = generateToken({
@@ -319,7 +319,7 @@ export async function refreshToken(userId: number) {
   }
 }
 
-// 导出用户数据
+// Export user data
 export async function exportUserData(userId: number) {
   const user = await prisma.user.findUnique({
     where: { id: userId },
@@ -355,10 +355,10 @@ export async function exportUserData(userId: number) {
   })
 
   if (!user) {
-    throw new AppError('用户不存在', 404)
+    throw new AppError('User not found', 404)
   }
 
-  // 移除敏感信息
+  // Remove sensitive information
   const { passwordHash: _, ...userData } = user
 
   return {

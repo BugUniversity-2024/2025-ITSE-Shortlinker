@@ -113,7 +113,7 @@ router.get('/:id', authenticate, async (req: Request, res: Response, next: NextF
     })
 
     if (!team) {
-      res.status(404).json({ detail: '团队不存在' })
+      res.status(404).json({ detail: 'Team not found' })
       return
     }
 
@@ -123,19 +123,19 @@ router.get('/:id', authenticate, async (req: Request, res: Response, next: NextF
   }
 })
 
-// 更新团队信息
+// Update team info
 router.put('/:id', authenticate, async (req: Request, res: Response, next: NextFunction) => {
   try {
     const teamId = parseInt(req.params.id, 10)
     const { name, description } = req.body
 
-    // 验证是团队 owner
+    // Verify is team owner
     const team = await prisma.team.findFirst({
       where: { id: teamId, ownerId: req.user!.id },
     })
 
     if (!team) {
-      res.status(404).json({ detail: '团队不存在或无权限修改' })
+      res.status(404).json({ detail: 'Team not found or no permission to modify' })
       return
     }
 
@@ -186,41 +186,41 @@ router.post('/:id/invite', authenticate, async (req: Request, res: Response, nex
     const teamId = parseInt(req.params.id, 10)
     const { email, role = 'member' } = req.body
 
-    // 验证是团队 owner 或 admin
+    // Verify is team owner or admin
     const membership = await prisma.teamMember.findUnique({
       where: { teamId_userId: { teamId, userId: req.user!.id } },
     })
     if (!membership || !['owner', 'admin'].includes(membership.role)) {
-      res.status(403).json({ detail: '无权限邀请成员' })
+      res.status(403).json({ detail: 'No permission to invite members' })
       return
     }
 
-    // 检查用户是否存在
+    // Check if user exists
     const user = await prisma.user.findUnique({ where: { email } })
     if (!user) {
-      res.status(404).json({ detail: '用户不存在' })
+      res.status(404).json({ detail: 'User not found' })
       return
     }
 
-    // 检查是否已是成员
+    // Check if already a member
     const existingMember = await prisma.teamMember.findUnique({
       where: { teamId_userId: { teamId, userId: user.id } },
     })
     if (existingMember) {
-      res.status(409).json({ detail: '用户已是团队成员' })
+      res.status(409).json({ detail: 'User is already a team member' })
       return
     }
 
-    // 检查是否有待处理的邀请
+    // Check for pending invitation
     const existingInvite = await prisma.teamInvitation.findFirst({
       where: { teamId, email, status: 'pending' },
     })
     if (existingInvite) {
-      res.status(409).json({ detail: '已有待处理的邀请' })
+      res.status(409).json({ detail: 'Pending invitation already exists' })
       return
     }
 
-    // 创建邀请，7天后过期
+    // Create invitation, expires in 7 days
     const expiresAt = new Date()
     expiresAt.setDate(expiresAt.getDate() + 7)
 
@@ -244,28 +244,28 @@ router.post('/invitations/:id/accept', authenticate, async (req: Request, res: R
     })
 
     if (!invitation) {
-      res.status(404).json({ detail: '邀请不存在' })
+      res.status(404).json({ detail: 'Invitation not found' })
       return
     }
 
-    // 验证邀请状态和过期时间
+    // Verify invitation status and expiration
     if (invitation.status !== 'pending') {
-      res.status(400).json({ detail: '邀请已处理' })
+      res.status(400).json({ detail: 'Invitation already processed' })
       return
     }
 
     if (invitation.expiresAt < new Date()) {
-      res.status(400).json({ detail: '邀请已过期' })
+      res.status(400).json({ detail: 'Invitation has expired' })
       return
     }
 
-    // 验证当前用户 email 匹配
+    // Verify current user email matches
     if (req.user!.email !== invitation.email) {
-      res.status(403).json({ detail: '此邀请不属于您' })
+      res.status(403).json({ detail: 'This invitation does not belong to you' })
       return
     }
 
-    // 创建成员记录并更新邀请状态
+    // Create member record and update invitation status
     await prisma.$transaction([
       prisma.teamMember.create({
         data: {
@@ -280,13 +280,13 @@ router.post('/invitations/:id/accept', authenticate, async (req: Request, res: R
       }),
     ])
 
-    res.json({ message: '已加入团队' })
+    res.json({ message: 'Joined team' })
   } catch (error) {
     next(error)
   }
 })
 
-// 拒绝邀请
+// Reject invitation
 router.post('/invitations/:id/reject', authenticate, async (req: Request, res: Response, next: NextFunction) => {
   try {
     const invitationId = parseInt(req.params.id, 10)
@@ -296,18 +296,18 @@ router.post('/invitations/:id/reject', authenticate, async (req: Request, res: R
     })
 
     if (!invitation) {
-      res.status(404).json({ detail: '邀请不存在' })
+      res.status(404).json({ detail: 'Invitation not found' })
       return
     }
 
-    // 验证当前用户 email 匹配
+    // Verify current user email matches
     if (req.user!.email !== invitation.email) {
-      res.status(403).json({ detail: '此邀请不属于您' })
+      res.status(403).json({ detail: 'This invitation does not belong to you' })
       return
     }
 
     if (invitation.status !== 'pending') {
-      res.status(400).json({ detail: '邀请已处理' })
+      res.status(400).json({ detail: 'Invitation already processed' })
       return
     }
 
@@ -316,30 +316,30 @@ router.post('/invitations/:id/reject', authenticate, async (req: Request, res: R
       data: { status: 'rejected' },
     })
 
-    res.json({ message: '已拒绝邀请' })
+    res.json({ message: 'Invitation rejected' })
   } catch (error) {
     next(error)
   }
 })
 
-// 退出团队
+// Leave team
 router.post('/:id/leave', authenticate, async (req: Request, res: Response, next: NextFunction) => {
   try {
     const teamId = parseInt(req.params.id, 10)
 
-    // 检查是否是团队成员
+    // Check if is team member
     const membership = await prisma.teamMember.findUnique({
       where: { teamId_userId: { teamId, userId: req.user!.id } },
     })
 
     if (!membership) {
-      res.status(404).json({ detail: '您不是该团队成员' })
+      res.status(404).json({ detail: 'You are not a member of this team' })
       return
     }
 
-    // Owner 不能退出，只能解散团队
+    // Owner cannot leave, can only delete team
     if (membership.role === 'owner') {
-      res.status(400).json({ detail: '团队创建者不能退出，请先转让团队或删除团队' })
+      res.status(400).json({ detail: 'Team owner cannot leave. Please transfer ownership or delete the team' })
       return
     }
 
@@ -347,13 +347,13 @@ router.post('/:id/leave', authenticate, async (req: Request, res: Response, next
       where: { teamId_userId: { teamId, userId: req.user!.id } },
     })
 
-    res.json({ message: '已退出团队' })
+    res.json({ message: 'Left team' })
   } catch (error) {
     next(error)
   }
 })
 
-// 更新成员角色
+// Update member role
 router.patch('/:id/members/:userId', authenticate, async (req: Request, res: Response, next: NextFunction) => {
   try {
     const teamId = parseInt(req.params.id, 10)
@@ -365,13 +365,13 @@ router.patch('/:id/members/:userId', authenticate, async (req: Request, res: Res
       data: { role },
     })
 
-    res.json({ message: '角色已更新' })
+    res.json({ message: 'Role updated' })
   } catch (error) {
     next(error)
   }
 })
 
-// 移除成员
+// Remove member
 router.delete('/:id/members/:userId', authenticate, async (req: Request, res: Response, next: NextFunction) => {
   try {
     const teamId = parseInt(req.params.id, 10)
@@ -381,13 +381,13 @@ router.delete('/:id/members/:userId', authenticate, async (req: Request, res: Re
       where: { teamId_userId: { teamId, userId } },
     })
 
-    res.json({ message: '成员已移除' })
+    res.json({ message: 'Member removed' })
   } catch (error) {
     next(error)
   }
 })
 
-// 删除团队
+// Delete team
 router.delete('/:id', authenticate, async (req: Request, res: Response, next: NextFunction) => {
   try {
     const teamId = parseInt(req.params.id, 10)
@@ -396,7 +396,7 @@ router.delete('/:id', authenticate, async (req: Request, res: Response, next: Ne
       where: { id: teamId, ownerId: req.user!.id },
     })
 
-    res.json({ message: '团队已删除' })
+    res.json({ message: 'Team deleted' })
   } catch (error) {
     next(error)
   }

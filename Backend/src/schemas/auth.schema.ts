@@ -1,14 +1,14 @@
 import { z } from 'zod'
 
 export const registerSchema = z.object({
-  username: z.string().min(3, '用户名至少3个字符').max(50, '用户名最多50个字符'),
-  email: z.string().email('邮箱格式不正确'),
-  password: z.string().min(8, '密码至少8个字符').max(100, '密码最多100个字符'),
+  username: z.string().min(3, 'Username must be at least 3 characters').max(50, 'Username cannot exceed 50 characters'),
+  email: z.string().email('Invalid email format'),
+  password: z.string().min(8, 'Password must be at least 8 characters').max(100, 'Password cannot exceed 100 characters'),
 })
 
 export const loginSchema = z.object({
-  username: z.string().min(1, '请输入用户名或邮箱'),
-  password: z.string().min(1, '请输入密码'),
+  username: z.string().min(1, 'Please enter username or email'),
+  password: z.string().min(1, 'Please enter password'),
 })
 
 export const updateProfileSchema = z.object({
@@ -18,8 +18,8 @@ export const updateProfileSchema = z.object({
 })
 
 export const changePasswordSchema = z.object({
-  current_password: z.string().min(1, '请输入当前密码'),
-  new_password: z.string().min(8, '新密码至少8个字符').max(100, '新密码最多100个字符'),
+  current_password: z.string().min(1, 'Please enter current password'),
+  new_password: z.string().min(8, 'New password must be at least 8 characters').max(100, 'New password cannot exceed 100 characters'),
 })
 
 export const updateSettingsSchema = z.object({
@@ -32,7 +32,7 @@ export const updateSettingsSchema = z.object({
 })
 
 export const deleteAccountSchema = z.object({
-  password: z.string().min(1, '请输入密码确认'),
+  password: z.string().min(1, 'Please enter password to confirm'),
 })
 
 export type RegisterInput = z.infer<typeof registerSchema>

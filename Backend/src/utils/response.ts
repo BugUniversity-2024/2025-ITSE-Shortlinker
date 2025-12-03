@@ -55,18 +55,18 @@ export function error(
   })
 }
 
-export function notFound(res: Response, message = '资源不存在'): Response {
+export function notFound(res: Response, message = 'Resource not found'): Response {
   return error(res, message, 404)
 }
 
-export function unauthorized(res: Response, message = '未授权访问'): Response {
+export function unauthorized(res: Response, message = 'Unauthorized'): Response {
   return error(res, message, 401)
 }
 
-export function forbidden(res: Response, message = '禁止访问'): Response {
+export function forbidden(res: Response, message = 'Forbidden'): Response {
   return error(res, message, 403)
 }
 
-export function serverError(res: Response, message = '服务器内部错误'): Response {
+export function serverError(res: Response, message = 'Internal server error'): Response {
   return error(res, message, 500)
 }

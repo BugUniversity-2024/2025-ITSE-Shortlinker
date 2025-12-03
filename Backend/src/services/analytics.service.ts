@@ -63,7 +63,7 @@ export async function getLinkAnalytics(userId: number, linkId: number, period: s
   })
 
   if (!link) {
-    throw new AppError('链接不存在', 404)
+    throw new AppError('Link not found', 404)
   }
 
   const now = new Date()

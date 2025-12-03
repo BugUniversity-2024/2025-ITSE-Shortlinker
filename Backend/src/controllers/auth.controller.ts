@@ -60,7 +60,7 @@ export async function changePassword(
 ): Promise<void> {
   try {
     await authService.changePassword(req.user!.id, req.body)
-    res.json({ message: '密码修改成功' })
+    res.json({ message: 'Password changed successfully' })
   } catch (error) {
     next(error)
   }
@@ -112,7 +112,7 @@ export async function deleteAccount(
 ): Promise<void> {
   try {
     await authService.deleteAccount(req.user!.id, req.body.password)
-    res.json({ message: '账户已删除' })
+    res.json({ message: 'Account deleted' })
   } catch (error) {
     next(error)
   }
